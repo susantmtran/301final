@@ -1,0 +1,32 @@
+---
+title: <b>Data Memo</b>
+subtitle: "Data Science III (STAT 301-3)"
+author: "Alex Chang, Jamie Lee, Grace Park, Nomi Tannenbaum, Susan Tran"
+date: "April 6th, 2021"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    highlight: "pygments"
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## [**Project Timeline**]{style="color: #AC3B61"}
+
+The due dates are April 21st for an exploratory data analysis and June 12th for the completed project. Given these deadlines, we expect to have our data set loaded into R by \_\_\_\_\_\_\_\_. We will start our analysis on \_\_\_\_\_\_\_ and begin to create our predictive model by \_\_\_\_\_\_\_.
+
+## [**The Data Set**]{style="color: #AC3B61"}
+
+We are using the \_\_\_\_\_\_\_ data set from \_\_\_\_\_\_, which documents \_\_\_\_\_\_\_. It contains \_\_\_ observations, but we will be focusing on \_\_\_\_\_\_\_\_ for our analysis.
+
+## [**Potential Research Questions**]{style="color: #AC3B61"}
+
+blah blah blah
+
+## [**Possible Challenges**]{style="color: #AC3B61"}
+
+blah blah blah
