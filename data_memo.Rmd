@@ -17,15 +17,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## [**Project Timeline**]{style="color: #AC3B61"}
 
-The due dates are April 21st for an exploratory data analysis and June 12th for the completed project. Given these deadlines, we expect to have our data set loaded into R by \_\_\_\_\_\_\_\_. We will start our analysis on \_\_\_\_\_\_\_ and begin to create our predictive model by \_\_\_\_\_\_\_.
+The due dates are April 21st for an exploratory data analysis and June 12th for the completed project. Given these deadlines, we expect to have our data set loaded into R by Wednesday, April 14th. We will start our analysis as soon as possible after that and will begin to create our predictive model by the end of April. That leaves us with about a month and a half to create different models, evaluate their performance, and draw a conclusion about the data set and a model that might be the "best" fit.
 
 ## [**The Data Set**]{style="color: #AC3B61"}
 
-We are using the \_\_\_\_\_\_\_ data set from \_\_\_\_\_\_, which documents \_\_\_\_\_\_\_. It contains \_\_\_ observations, but we will be focusing on \_\_\_\_\_\_\_\_ for our analysis.
+blah blah blah
 
 ## [**Potential Research Questions**]{style="color: #AC3B61"}
 
-blah blah blah
+Which variables predict (or is related to) an Oscar winner?
 
 ## [**Possible Challenges**]{style="color: #AC3B61"}
 
