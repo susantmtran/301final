@@ -21,7 +21,13 @@ The due dates are April 21st for an exploratory data analysis and June 12th for 
 
 ## [**The Data Set**]{style="color: #AC3B61"}
 
-blah blah blah
+We are interested in predicting the winners for the Academy Awards. Since the 2021 Academy Awards are approaching in the end of April, our group would like to see what factors play heavily into an Oscar win for not only this year's event but also for future Academy Award years. From the Kaggle website, there are a few possible dataset choices that are appropriate for our project. The dataset below contains 27 variables and 441 observations, so it is a relatively small dataset. We may also need to join more sources of data together because our group would also like to focus on the role of gender in the film industry. This dataset does not contain any information on that.
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+oscars_data <- read_csv("Data/Oscars-demographics-DFE.csv")
+```
+
 
 ## [**Potential Research Questions**]{style="color: #AC3B61"}
 
