@@ -59,4 +59,4 @@ While it would be interesting to study which variables might *cause* a change in
 
 ## [**Possible Challenges**]{style="color: #AC3B61"}
 
-Our data set is limited because there are only 441 observations. This will probably be too small for our model building and selection process. In order to grow our data set, we could scrape data from from the Oscars website, which will provide its own challenges. Alternatively we could merge this data set with perhaps a more robust one.
+Our data set is limited because there are only 441 observations. This will probably be too small for our model building and selection process. In order to grow our data set, we could scrape data from from the Oscars website, which will provide its own challenges. For example, with the 3rd potential data set mentioned earlier, the data set itself does not contain sufficient variables, therefore requiring that additional information be collected separately which may not be feasible due to the scope. Alternatively we could merge our data set with perhaps a more robust one, which would also pose challenges in the gaps of data upon merging.
