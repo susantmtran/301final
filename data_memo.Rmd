@@ -44,4 +44,4 @@ While it would be interesting to study which variables might *cause* a change in
 
 ## [**Possible Challenges**]{style="color: #AC3B61"}
 
-blah blah blah
+Our data set is limited because there are only 441 observations. This will probably be too small for our model building and selection process. In order to grow our data set, we could scrape data from from the Oscars website, which will provide its own challenges. Alternatively we could merge this data set with perhaps a more robust one.
