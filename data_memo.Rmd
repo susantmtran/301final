@@ -9,6 +9,8 @@ output:
     toc_float: true
     highlight: "pygments"
     theme: cosmo
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -21,17 +23,24 @@ The due dates are April 21st for an exploratory data analysis and June 12th for 
 
 ## [**The Data Set**]{style="color: #AC3B61"}
 
-We are interested in predicting the winners for the Academy Awards. Since the 2021 Academy Awards are approaching in the end of April, our group would like to see what factors play heavily into an Oscar win for not only this year's event but also for future Academy Award years. From the Kaggle website, there are a few possible dataset choices that are appropriate for our project. The dataset below contains 27 variables and 441 observations, so it is a relatively small dataset. We may also need to join more sources of data together because our group would also like to focus on the role of gender in the film industry. This dataset does not contain any information on that.
+We are interested in predicting the winners for the Academy Awards, popularly known as the Oscars. Since the 2021 Academy Awards are approaching in the end of April, our group would like to see what factors play heavily into an Oscar win, not only for this year's event but also for future Academy Awards.
+
+From the Kaggle website, there are a few possible data set choices that are appropriate for our project. The data set below contains 27 variables and 441 observations, which is relatively small.
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 oscars_data <- read_csv("Data/Oscars-demographics-DFE.csv")
 ```
 
+We may also need to join more sources of data together because our group would also like to focus on the role of gender in the film industry. This data set does not contain any information on that, but it could useful to extract statistics from IMDb about an actor's background, gender, popularity, and so forth.
 
 ## [**Potential Research Questions**]{style="color: #AC3B61"}
 
-Which variables predict (or is related to) an Oscar winner?
+While it would be interesting to study which variables might *cause* a change in the outcome, we are more interested in which specific variables *predict* (or are related to) an Oscar winner.
+
+-   What is the most important variable for predicting an Oscar winner? Conversely, what is the least important variable?
+
+-   Which variables might be interactive and therefore may predict an Oscar winner more accurately when those interactions are accounted for?
 
 ## [**Possible Challenges**]{style="color: #AC3B61"}
 
