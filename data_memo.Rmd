@@ -32,22 +32,21 @@ library(tidyverse)
 oscars_data <- read_csv("Data/Oscars-demographics-DFE.csv")
 ```
 
-We may also need to join more sources of data together because our group would also like to focus on the role of gender in the film industry. This data set does not contain any information on that, but it could useful to extract statistics from IMDb about an actor's background, gender, popularity, and so forth.
-
-Another potential data set that we could use, also from the [Kaggle](https://www.kaggle.com/vipulgote4/oscars-nominated-movies-from-2000-to-2017) website, contains information about Oscar nominated movies from 2000 to 2017. 
+Another potential data set that we could use, also from the [Kaggle](https://www.kaggle.com/vipulgote4/oscars-nominated-movies-from-2000-to-2017) website, contains information about Oscar nominated movies from 2000 to 2017.
 
 ```{r, message=FALSE}
 potential_data <- read_csv("Data/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 ```
 
-This data set is considerably larger and has a lot more information on different award ceremonies as well (such as BAFTA, Screen Actors Guild, etc). We could potentially look into merging these two data sets. We would still need to scrape data from IMDb because this data set does not contain any information on the specific actors or directors. 
+This data set is considerably larger and has a lot more information on different award ceremonies as well (such as BAFTA, Screen Actors Guild, etc). We could potentially look into merging these two data sets.
 
-The last potential data set we are considering, also from [Kaggle](https://www.kaggle.com/unanimad/the-oscar-award), is the largest of the three with over 10,000 observations. It contains Oscars data from 1927-2020 and includes both the individual who won the award and the movie for which they won it. Again, if we wanted to look at the demographics of the winners we would need to collect data from IMDb, but otherwise it seems to be a pretty robust option. 
+The last potential data set we are considering, also from [Kaggle](https://www.kaggle.com/unanimad/the-oscar-award), is the largest of the three with over 10,000 observations. It contains Oscars data from 1927-2020 and includes both the individual who won the award and the movie for which they won it.
 
 ```{r, message=FALSE}
 second_potential <- read_csv("Data/the_oscar_award.csv")
 ```
 
+These are all extensive options for base data sets. However, we are interested in how external factors like box office revenue and critic ratings might play a role in an Oscar win. Our initial interest was in demographics such as gender and race, but we found that it might be difficult to manually pull that data on our own. Otherwise, we can most likely scrape the rest of the more objective data from statistical websites such as IMDb. If we do want to incorporate at least one demographic factor, though, the Bechdel Test is a often-used metric for gender representation in films that has a website and data dedicated to many movies. Given that Oscar nominees and wins tend to be recognizable films, we are sure that these public data sources will make scraping fairly manageable.
 
 ## [**Potential Research Questions**]{style="color: #AC3B61"}
 
