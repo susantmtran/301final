@@ -1,6 +1,6 @@
 ---
 title: "Final EDA"
-author: "Grace Park"
+author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
 date: "4/21/2021"
 output: html_document
 ---
