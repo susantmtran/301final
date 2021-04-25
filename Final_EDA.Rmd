@@ -25,4 +25,8 @@ describing dataset and source here... variables of interest: `critics_rating`, `
 
 ```{r}
 skimr::skim_without_charts(movies)
+
+movies %>%
+  ggplot(aes(x = best_pic_nom)) +
+  geom_bar()
 ```
