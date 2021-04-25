@@ -9,3 +9,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Dataset
+
+```{r message=FALSE, warning=FALSE}
+# load package 
+library(tidyverse)
+
+# load data
+load("Data/movies.RData")
+```
+
+describing dataset and source here... variables of interest: `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` ........ to predict `best_pic_nom`.
+
+## Exploratory Data Analysis
+
+```{r}
+skimr::skim_without_charts(movies)
+```
