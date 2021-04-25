@@ -30,3 +30,5 @@ movies %>%
   ggplot(aes(x = best_pic_nom)) +
   geom_bar()
 ```
+
+missingness issues:
