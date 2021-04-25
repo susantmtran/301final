@@ -32,3 +32,18 @@ movies %>%
 ```
 
 missingness issues:
+
+```{r}
+miss_var_summary(movies)
+```
+
+There are no major missingness issues; the top 3 predictors with the most missingness are actor5, actor4, and actor3, respectively, perhaps meaning that some movies just did not have as many main actors.
+
+```{r}
+movies %>% 
+  ggplot(aes(x = mpaa_rating, fill = best_pic_nom)) +
+  geom_bar(position = "dodge")
+```
+
+This bar plot shows that the dataset is representative of a lot of R-rated movies; however, 
+
