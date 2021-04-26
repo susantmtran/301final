@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
 
 ```{r}
 # load package 
+library(lubridate)
 library(tidyverse)
 library(naniar)
 
@@ -64,9 +65,6 @@ movies %>%
                                   face = "bold"))
 ```
 
-<<<<<<< HEAD
-
-=======
 Fittingly, for our point of analysis of award show winners and losers, feature films are most represented in this data set. We can see that only feature films win the best picture award in the first place, and a very marginal numbers of feature films, at that.
 
 ## Notable Elements
@@ -109,11 +107,66 @@ movies %>%
 
 Looking at the faceted graphs above, we find that films in the `drama` genre will likely be the most essential observations in our greater analysis of the Academy Awards.
 
+```{r}
+movies %>% 
+ggplot(aes(title_type)) +
+  geom_bar(aes(fill = best_pic_win)) + 
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Loser", "Winner")) + 
+  labs(x = NULL, y = NULL, title = "Best Picture Win by Title Type") + 
+  theme_classic()
+```
+
+This bar chart reveals that most of the films that win best picture are feature films, rather than documentaries and TV movies. 
+
+```{r}
+movies %>% 
+  ggplot(aes(best_pic_nom, fill = best_pic_nom)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~mpaa_rating) +
+  scale_fill_brewer(name = NULL,
+                  palette = "Set2",
+                  labels = c("Not Nominated", "Nominated")) +
+  labs(x = NULL, y = NULL,
+       title = "Best Picture Nominations by Rating") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+```
+
+This plot portrays that there are a lot of R-rated films represented in this dataset; this rating category has the most pictures not nominated as well as nominated.
+
+```{r}
+movies_1 <- movies %>% 
+  mutate(thtr_rel_month = month(thtr_rel_month, label = TRUE))
+
+movies_1 %>% 
+  ggplot(aes(
+    x = thtr_rel_month,
+    fill = best_pic_nom
+  )) +
+  geom_bar(position = "stack") +
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Not Nominated", "Nominated")) +
+  labs(x = NULL, y = NULL,
+       title = "Best Picture Nominations by Month Released in Theaters") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+```
+
+Above, we see that movies that were released in theaters in December had the most nominations in comparison to other months; this may be due to the fact that the Oscars typically takes place near the end of the year. 
+
 # Conclusion
 
-<<<<<<< HEAD
-Wrapping up our analysis of the data set, we find that \_\_\_\_\_\_\_\_. However, \_\_\_\_\_\_\_\_.
->>>>>>> 09c0a1a35925b3d00eefe9e47d91ba75d4b56d93
-=======
 Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
->>>>>>> 42ea6fa61245e3d6199689cc2cd130785c930cc9
