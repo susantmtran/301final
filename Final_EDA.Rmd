@@ -27,7 +27,7 @@ library(naniar)
 load("data/movies.RData")
 ```
 
-describing dataset and source here... variables of interest: `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` ........ to predict `best_pic_nom`.
+Our data set was found on [Kaggle](https://www.kaggle.com/nichen301/movie-data) and contains information about 651 randomly chosen movies produced and released before 2016 including critic data, Academy Award nominations, and main actors/actresses. A few variables of interest are `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` which we will be using to predict `best_pic_nom`.
 
 # Exploratory Data Analysis
 
@@ -43,7 +43,7 @@ gg_miss_var(movies, facet = title_type)
 gg_miss_upset(movies)
 ```
 
-The variables with the highest levels of missingness are `actor4` and `actor5`. This is not surprising as some of the films represented in the data set are independently and/or fairly unknown, and therefore would not have the budget nor the need for a larger cast. Understandably, if a film does not have an `actor3`, it was also not have an `actor4` or an `actor5`.
+The variables with the highest levels of missingness are `actor4` and `actor5`. This is not surprising as some of the films represented in the data set are independently and/or fairly unknown, and therefore would not have the budget nor the need for a larger cast. Understandably, if a film does not have an `actor3`, it would also not have an `actor4` or an `actor5`.
 
 ## Trends
 
@@ -108,4 +108,4 @@ Looking at the faceted graphs above, we find that films in the `drama` genre wil
 
 # Conclusion
 
-Wrapping up our analysis of the data set, we find that \_\_\_\_\_\_\_\_. However, \_\_\_\_\_\_\_\_.
+Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
