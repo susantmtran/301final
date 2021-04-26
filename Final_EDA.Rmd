@@ -1,6 +1,6 @@
 ---
 title: "Final EDA"
-author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
+author: "Grace Park, Susan Tran, Nomi Tannenbaum, Jamie Lee, Alex Chang"
 date: "4/25/2021"
 output:
   html_document:
@@ -20,8 +20,9 @@ knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
 
 ```{r}
 # load package 
-library(tidyverse)
+library(ggplot2)
 library(naniar)
+library(tidyverse)
 
 # load data
 load("data/movies.RData")
@@ -64,9 +65,6 @@ movies %>%
                                   face = "bold"))
 ```
 
-<<<<<<< HEAD
-
-=======
 Fittingly, for our point of analysis of award show winners and losers, feature films are most represented in this data set. We can see that only feature films win the best picture award in the first place, and a very marginal numbers of feature films, at that.
 
 ## Notable Elements
@@ -109,11 +107,17 @@ movies %>%
 
 Looking at the faceted graphs above, we find that films in the `drama` genre will likely be the most essential observations in our greater analysis of the Academy Awards.
 
+```{r}
+movies %>% 
+  ggplot(aes(title_type)) +
+  geom_bar(aes(fill = best_pic_win)) + 
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Loser", "Winner")) + 
+  labs(x = NULL, y = NULL, title = "Best Picture Win by Title Type") + 
+  theme_classic()
+```
+
 # Conclusion
 
-<<<<<<< HEAD
-Wrapping up our analysis of the data set, we find that \_\_\_\_\_\_\_\_. However, \_\_\_\_\_\_\_\_.
->>>>>>> 09c0a1a35925b3d00eefe9e47d91ba75d4b56d93
-=======
 Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
->>>>>>> 42ea6fa61245e3d6199689cc2cd130785c930cc9
