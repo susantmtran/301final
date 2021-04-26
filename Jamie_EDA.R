@@ -2,7 +2,6 @@ library(tidyverse)
 library(naniar)
 library(skimr)
 library(lubridate)
-library(dplyr)
 
 load("Data/movies.RData")
 
