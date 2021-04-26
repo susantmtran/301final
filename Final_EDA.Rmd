@@ -2,48 +2,114 @@
 title: "Final EDA"
 author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
 date: "4/25/2021"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    highlight: "tango"
+    theme: paper
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
 ```
 
-## Dataset
+# Data Set
 
-```{r message=FALSE, warning=FALSE}
+```{r}
 # load package 
 library(tidyverse)
+library(naniar)
 
 # load data
-load("Data/movies.RData")
+load("data/movies.RData")
 ```
 
 describing dataset and source here... variables of interest: `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` ........ to predict `best_pic_nom`.
 
-## Exploratory Data Analysis
+# Exploratory Data Analysis
+
+## Missingness
 
 ```{r}
 skimr::skim_without_charts(movies)
 
-movies %>%
-  ggplot(aes(x = best_pic_nom)) +
-  geom_bar()
-```
-
-missingness issues:
-
-```{r}
 miss_var_summary(movies)
+
+gg_miss_var(movies, facet = title_type)
+
+gg_miss_upset(movies)
 ```
 
-There are no major missingness issues; the top 3 predictors with the most missingness are actor5, actor4, and actor3, respectively, perhaps meaning that some movies just did not have as many main actors.
+The variables with the highest levels of missingness are `actor4` and `actor5`. This is not surprising as some of the films represented in the data set are independently and/or fairly unknown, and therefore would not have the budget nor the need for a larger cast. Understandably, if a film does not have an `actor3`, it was also not have an `actor4` or an `actor5`.
+
+## Trends
 
 ```{r}
 movies %>% 
-  ggplot(aes(x = mpaa_rating, fill = best_pic_nom)) +
-  geom_bar(position = "dodge")
+  ggplot(aes(title_type)) +
+  geom_bar(aes(fill = best_pic_win)) +
+  scale_fill_brewer(name = "Won Best Picture?",
+                    palette = "Set2",
+                    labels = c("NO", "YES")) +
+  labs(x = NULL, y = NULL, title = "Representation of Types of Titles") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
 ```
 
-This bar plot shows that the dataset is representative of a lot of R-rated movies; however, 
+<<<<<<< HEAD
 
+=======
+Fittingly, for our point of analysis of award show winners and losers, feature films are most represented in this data set. We can see that only feature films win the best picture award in the first place, and a very marginal numbers of feature films, at that.
+
+## Notable Elements
+
+```{r}
+movies %>% 
+  ggplot(aes(best_pic_nom, fill = best_pic_nom)) +
+  geom_bar() +
+  facet_wrap(~ genre) +
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Not Nominated", "Nominated")) +
+  labs(x = NULL, y = NULL,
+         title = "Best Picture Nominations by Genre") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+
+movies %>% 
+  ggplot(aes(best_pic_win, fill = best_pic_win)) +
+  geom_bar() +
+  facet_wrap(~ genre) +
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Loser", "Winner")) +
+  labs(x = NULL, y = NULL,
+         title = "Best Picture Wins by Genre") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+```
+
+Looking at the faceted graphs above, we find that films in the `drama` genre will likely be the most essential observations in our greater analysis of the Academy Awards.
+
+# Conclusion
+
+Wrapping up our analysis of the data set, we find that \_\_\_\_\_\_\_\_. However, \_\_\_\_\_\_\_\_.
+>>>>>>> 09c0a1a35925b3d00eefe9e47d91ba75d4b56d93
