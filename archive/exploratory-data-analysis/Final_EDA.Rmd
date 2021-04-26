@@ -25,7 +25,7 @@ library(tidyverse)
 library(naniar)
 
 # load data
-load("data/movies.RData")
+load("data/unprocessed/movies.RData")
 ```
 
 Our data set was found on [Kaggle](https://www.kaggle.com/nichen301/movie-data) and contains information about 651 randomly chosen movies produced and released before 2016 including critic data, Academy Award nominations, and main actors/actresses. A few variables of interest are `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` which we will be using to predict `best_pic_nom`.
