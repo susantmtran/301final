@@ -109,6 +109,53 @@ movies %>%
 
 Looking at the faceted graphs above, we find that films in the `drama` genre will likely be the most essential observations in our greater analysis of the Academy Awards.
 
+```{r}
+movies %>% 
+  ggplot(aes(best_pic_nom, fill = best_pic_nom)) +
+  geom_bar(position = "dodge") +
+  facet_wrap(~mpaa_rating) +
+  scale_fill_brewer(name = NULL,
+                  palette = "Set2",
+                  labels = c("Not Nominated", "Nominated")) +
+  labs(x = NULL, y = NULL,
+       title = "Best Picture Nominations by Rating") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+```
+
+This plot portrays that there are a lot of R-rated films represented in this dataset; this rating category has the most pictures not nominated as well as nominated.
+
+```{r}
+movies_1 <- movies %>% 
+  mutate(thtr_rel_month = month(thtr_rel_month, label = TRUE))
+
+movies_1 %>% 
+  ggplot(aes(
+    x = thtr_rel_month,
+    fill = best_pic_nom
+  )) +
+  geom_bar(position = "stack") +
+  scale_fill_brewer(name = NULL,
+                    palette = "Set2",
+                    labels = c("Not Nominated", "Nominated")) +
+  labs(x = NULL, y = NULL,
+       title = "Best Picture Nominations by Month Released in Theaters") +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        plot.title = element_text(size = 12,
+                                  hjust = 0.5,
+                                  vjust = 0,
+                                  face = "bold"))
+```
+
+Above, we see that movies that were released in theaters in December had the most nominations in comparison to other months; this may be due to the fact that the Oscars typically takes place near the end of the year. 
+
 # Conclusion
 
 <<<<<<< HEAD
