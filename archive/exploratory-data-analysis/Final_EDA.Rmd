@@ -6,8 +6,8 @@ output:
   html_document:
     toc: true
     toc_float: true
-    highlight: "tango"
     theme: paper
+    code_folding: hide
 editor_options: 
   chunk_output_type: console
 ---
