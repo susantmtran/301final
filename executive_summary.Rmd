@@ -1,0 +1,36 @@
+---
+title: "Executive summary"
+author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
+date: "6/6/2021"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: paper
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
+```
+
+# Data Set
+
+```{r}
+# load package 
+library(lubridate)
+library(tidyverse)
+library(naniar)
+
+# load data
+load("data/unprocessed/movies.RData")
+```
+
+Our data set was found on [Kaggle](https://www.kaggle.com/nichen301/movie-data) and contains information about 651 randomly chosen movies produced and released before 2016 including critic data, Academy Award nominations, and main actors/actresses. A few variables of interest are `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` which we will be using to predict `best_pic_nom`.
+
+
+# Conclusion
+
+Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
