@@ -1,11 +1,12 @@
 library(tidyverse)
 library(tidymodels)
 
-rf_tuned <- read_rds("rf_tuned.rds")
-nn_tuned <- read_rds("nn_tuned.rds")
-bt_tuned <- read_rds("bt_tuned.rds")
-mlp_tuned <- read_rds("mlp_tuned.rds")
-en_tuned <- read_rds("en_tuned.rds")
+# trial 2 are better for all
+rf_tuned <- read_rds("rf_tuned2.rds")
+nn_tuned <- read_rds("nn_tuned2.rds")
+bt_tuned <- read_rds("bt_tuned2.rds")
+mlp_tuned <- read_rds("mlp_tuned2.rds")
+en_tuned <- read_rds("en_tuned2.rds")
 
 tune_results <- 
   tibble(
