@@ -61,7 +61,7 @@ toc(log = TRUE)
 rf_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(rf_model_time, "rf_model_time.rds")
-write_rds(rf_tuned, "rf_tuned.rds")
+write_rds(rf_model_time, "model-info/timing/rf_model_time.rds")
+write_rds(rf_tuned, "model-info/tuned/rf_tuned.rds")
 
 

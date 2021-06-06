@@ -63,5 +63,5 @@ toc(log = TRUE)
 bt_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(bt_model_time, "bt_model_time2.rds")
-write_rds(bt_tuned, "bt_tuned2.rds")
+write_rds(bt_model_time, "model-info/timing/bt_model_time2.rds")
+write_rds(bt_tuned, "model-info/tuned/bt_tuned2.rds")

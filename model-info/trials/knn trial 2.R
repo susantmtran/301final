@@ -58,5 +58,5 @@ toc(log = TRUE)
 nn_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(nn_model_time, "nn_model_time2.rds")
-write_rds(nn_tuned, "nn_tuned2.rds")
+write_rds(nn_model_time, "model-info/timing/nn_model_time2.rds")
+write_rds(nn_tuned, "model-info/tuned/nn_tuned2.rds")

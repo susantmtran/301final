@@ -59,5 +59,5 @@ toc(log = TRUE)
 en_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(en_model_time, "en_model_time2.rds")
-write_rds(en_tuned, "en_tuned2.rds")
+write_rds(en_model_time, "model-info/timing/en_model_time2.rds")
+write_rds(en_tuned, "model-info/tuned/en_tuned2.rds")

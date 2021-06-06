@@ -62,24 +62,5 @@ toc(log = TRUE)
 rf_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(rf_model_time, "rf_model_time2.rds")
-write_rds(rf_tuned, "rf_tuned2.rds")
-
-rf_tuned <- read_rds("rf_tuned2.rds")
-
-
-tune_results <- 
-  tibble(
-    model_type = c("rf_tuned2"),
-    tune_info = list(rf_tuned),
-    assessment_info = map(tune_info, collect_metrics),
-    best_model = map(tune_info, ~select_best(.x, metric = "accuracy"))
-  )
-
-tune_results %>%
-  select(model_type, assessment_info) %>%
-  unnest(assessment_info) %>%
-  filter(.metric == "accuracy") %>%
-  group_by(model_type) %>%
-  summarise(Accuracy = max(mean)) %>% 
-  arrange(desc(Accuracy))
+write_rds(rf_model_time, "model-info/timing/rf_model_time2.rds")
+write_rds(rf_tuned, "model-info/tuned/rf_tuned2.rds")

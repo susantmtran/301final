@@ -60,5 +60,5 @@ toc(log = TRUE)
 mlp_model_time <- tic.log(format = TRUE)
 
 # Write out results & workflow
-write_rds(mlp_model_time, "mlp_model_time.rds")
-write_rds(mlp_tuned, "mlp_tuned.rds")
+write_rds(mlp_model_time, "model-info/timing/mlp_model_time.rds")
+write_rds(mlp_tuned, "model-info/tuned/mlp_tuned.rds")
