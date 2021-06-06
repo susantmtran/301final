@@ -1,9 +1,12 @@
 library(tidyverse)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 0f31666e222ac04c9a3c2cd0ed1a470946959417
+=======
+>>>>>>> cdfcf1a35a7aaf5ffbf1f45b2d061c44213445a9
 potential_data <- read_csv("data/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
 set.seed(101)
