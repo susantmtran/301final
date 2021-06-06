@@ -1,10 +1,9 @@
 library(tidyverse)
-library(tidymodels)
-library(ranger)
-library(tictoc)
 
+<<<<<<< HEAD
 
-oscars_data <- read_csv("data/Oscars-demographics-DFE.csv")
+=======
+>>>>>>> 0f31666e222ac04c9a3c2cd0ed1a470946959417
 potential_data <- read_csv("data/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
 set.seed(101)
