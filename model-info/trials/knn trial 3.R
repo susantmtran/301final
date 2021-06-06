@@ -18,6 +18,7 @@ potential_data <- potential_data %>%
          awards_ratio = awards_wins/awards_nominations)
 
 potential_data$awards_ratio[is.nan(potential_data$awards_ratio)] <- 0
+potential_data %>% select(starts_with("awards")) %>% view()
 
 oscar_split <- initial_split(potential_data, prop = 0.7, strata = Oscar_nominated)
 oscar_train <- training(oscar_split) 
@@ -25,12 +26,12 @@ oscar_test <- testing(oscar_split)
 oscar_folds <- vfold_cv(potential_data, v = 5, repeats = 3, strata = Oscar_nominated)
 
 oscar_recipe <- recipe(
-  Oscar_nominated ~ certificate + duration + rate + metascore + gross + release_date.month +
+  Oscar_nominated ~ certificate + duration + rate + metascore + gross +
     awards_wins + awards_nominations + awards_ratio + Golden_Globes_nominated +
     Critics_Choice_nominated + BAFTA_nominated + People_Choice_nominated +
     New_York_Film_Critics_Circle_nominated +
     Los_Angeles_Film_Critics_Association_nominated, data = oscar_train) %>%
-  step_impute_bag(release_date.month, metascore, gross, certificate) %>%
+  step_impute_bag(metascore, gross, certificate) %>%
   step_other(all_predictors(), threshold = 0.02) %>% 
   step_dummy(all_nominal_predictors(), one_hot = TRUE) %>%
   step_normalize(all_numeric())
@@ -44,7 +45,7 @@ nn_model <- nearest_neighbor(mode = "classification",
   set_engine("kknn")
 
 nn_params <- parameters(nn_model) 
-nn_grid <- grid_regular(nn_params, levels = 5)
+nn_grid <- grid_regular(nn_params, levels = 3)
 
 nn_workflow <- workflow() %>%
   add_model(nn_model) %>%

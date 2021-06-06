@@ -1,10 +1,5 @@
 library(tidyverse)
-library(tidymodels)
-library(ranger)
-library(tictoc)
 
-
-oscars_data <- read_csv("data/Oscars-demographics-DFE.csv")
 potential_data <- read_csv("data/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
 # Oscar nominated: 0 is No nomination and 1 is one or more nominations
