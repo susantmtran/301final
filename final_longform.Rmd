@@ -1,6 +1,7 @@
 ---
-title: "Final"
-author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
+title: "Final Project for STAT 301-3"
+subtitle: "Spring 2021"
+author: "Grace Park, Susan Tran, Nomi Tannenbaum, Jamie Lee, Alex Chang"
 output:
   html_document:
     toc: true
@@ -12,160 +13,137 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
 
-# Data Set
+# *Data Set*
 
 ```{r}
-# load package 
-library(lubridate)
+# load packages
 library(tidyverse)
-library(naniar)
+
+# set seed
+set.seed(101)
 
 # load data
-load("data/unprocessed/movies.RData")
+df <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 ```
 
-Our data set was found on [Kaggle](https://www.kaggle.com/nichen301/movie-data) and contains information about 651 randomly chosen movies produced and released before 2016 including critic data, Academy Award nominations, and main actors/actresses. A few variables of interest are `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` which we will be using to predict `best_pic_nom`.
+We found our data set through the BigML platform, which is considered to be a powerful machine learning service in the data science world. There are [multiple data sets](https://bigml.com/user/academy_awards/gallery/datasets) related to the Academy Awards on BigML, whose users scraped the data from [IMDb](https://www.imdb.com/), a well-known online database on movies, television shows, and so forth. We are focusing the [2000-2017](https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b) time period of nominations and awards, and plan to predict whether or not a film has received an Oscar nomination (in any category) depending on a few select variables.
 
-# Exploratory Data Analysis
+# *Exploratory Data Analysis*
+
+To start off our data analysis, we will observe the missing values, if any, using the `skimr` and `naniar` packages. The essential component of feature engineering for models is *non*-missingness, so it important that we address missing values as soon as possible.
 
 ## Missingness
 
-```{r}
-skimr::skim_without_charts(movies)
-
-miss_var_summary(movies)
-
-gg_miss_var(movies, facet = title_type)
-
-gg_miss_upset(movies)
+```{r results='hide'}
+skimr::skim_without_charts(df)
 ```
 
-The variables with the highest levels of missingness are `actor4` and `actor5`. This is not surprising as some of the films represented in the data set are independently and/or fairly unknown, and therefore would not have the budget nor the need for a larger cast. Understandably, if a film does not have an `actor3`, it would also not have an `actor4` or an `actor5`.
+```{r}
+naniar::miss_var_summary(df)
+```
+
+Given the difficult that we had with finding a data set that would work well for project and because there are a little over 100 variables for about 1000 movies, it is unsurprising that there is a significant amount of missing values in the data set. However, after taking a closer look, the variables with the highest levels of missingness are those indicating which categories movies are nominated for, and which categories movies have won awards in. Understandably, if a movie is not nominated and therefore not a winner, these categories are nonexistent and therefore irrelevant. As result, these variables will be unhelpful in creating our models and should not be included in our recipes.
+
+Without those variables in mind, the highest percentage of missingness is 10% for the `popularity` variable. The general rule of thumb for missingness is about 20%, so we are good to consider the remaining variables and likely impute during the recipe steps to solve any additional problems.
+
+Note that the results of `skimr::skim_without_charts()` are hidden due to the length and irrelevance to the overall long form. Now that we are aware of the missing values, we can take a closer look at the different variables in the data set and gauge their potential usefulness in our recipe(s).
 
 ## Trends
 
 ```{r}
-movies %>% 
-  ggplot(aes(title_type)) +
-  geom_bar(aes(fill = best_pic_win)) +
-  scale_fill_brewer(name = "Won Best Picture?",
-                    palette = "Set2",
-                    labels = c("NO", "YES")) +
-  labs(x = NULL, y = NULL, title = "Representation of Types of Titles") +
+df %>% ggplot(aes(awards_nominations, awards_wins)) +
+  geom_jitter(aes(color = Oscar_Best_Picture_nominated), alpha = 0.5) +
+  scale_color_manual("Nominated for Oscars Best Picture?",
+                     values = c("#008f69", "#2f84de"),
+                     labels = c("NO", "YES")) +
+  geom_smooth(color = "black") +
+  labs(title = "Cumulative Nominations and Awards",
+       subtitle = "Films Released during 2000–2017",
+       x = "Total Nominations",
+       y = "Total Wins",
+       caption = "For The Academy Awards, Golden Globes, BAFTA, and other prestigious
+       film critic organizations.") +
   theme_classic() +
   theme(legend.position = "top",
-        legend.direction = "horizontal",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  vjust = 0,
-                                  face = "bold"))
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Fittingly, for our point of analysis of award show winners and losers, feature films are most represented in this data set. We can see that only feature films win the best picture award in the first place, and a very marginal numbers of feature films, at that.
+In the plot above, we can observe that the total number of nominations that a film receives is positively correlated with its number of wins. We can also observe that films nominated for The Oscars Best Picture award tend to be on the right side of the plot. Understandably, films that are well-crafted enough to receive a Best Picture nomination will most likely have considerable nominations and wins in different categories and award shows.
 
 ## Notable Elements
 
 ```{r}
-movies %>% 
-  ggplot(aes(best_pic_nom, fill = best_pic_nom)) +
-  geom_bar() +
-  facet_wrap(~ genre) +
-  scale_fill_brewer(name = NULL,
-                    palette = "Set2",
-                    labels = c("Not Nominated", "Nominated")) +
-  labs(x = NULL, y = NULL,
-         title = "Best Picture Nominations by Genre") +
+df %>% ggplot(aes(rate, metascore)) +
+  geom_jitter(alpha = 0.5, color = "#008f69") +
+  geom_smooth(color = "black") +
+  labs(title = "IMDb Rating vs Metascore",
+       subtitle = "Films Released during 2000–2017",
+       x = "IMDb Rating",
+       y = "Metascore",
+       caption = "The metascore is a weighted average of many reviews from reputable
+       critics.") +
   theme_classic() +
   theme(legend.position = "top",
-        legend.direction = "horizontal",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  vjust = 0,
-                                  face = "bold"))
-
-movies %>% 
-  ggplot(aes(best_pic_win, fill = best_pic_win)) +
-  geom_bar() +
-  facet_wrap(~ genre) +
-  scale_fill_brewer(name = NULL,
-                    palette = "Set2",
-                    labels = c("Loser", "Winner")) +
-  labs(x = NULL, y = NULL,
-         title = "Best Picture Wins by Genre") +
-  theme_classic() +
-  theme(legend.position = "top",
-        legend.direction = "horizontal",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  vjust = 0,
-                                  face = "bold"))
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Looking at the faceted graphs above, we find that films in the `drama` genre will likely be the most essential observations in our greater analysis of the Academy Awards.
+IMDb ratings reflect their user input, which does not necessarily come from renowned and/or prestigious film critics. In contrast, the metascore is a conglomerate of the different famous film critic organizations. Again, these two values are positively correlated but with enough variation so that they are distinct enough to use in our recipe(s). `step_corr()` might even be useful.
 
 ```{r}
-movies %>% 
-ggplot(aes(title_type)) +
-  geom_bar(aes(fill = best_pic_win)) + 
-  scale_fill_brewer(name = NULL,
-                    palette = "Set2",
-                    labels = c("Loser", "Winner")) + 
-  labs(x = NULL, y = NULL, title = "Best Picture Win by Title Type") + 
-  theme_classic()
-```
-
-This bar chart reveals that most of the films that win best picture are feature films, rather than documentaries and TV movies. 
-
-```{r}
-movies %>% 
-  ggplot(aes(best_pic_nom, fill = best_pic_nom)) +
-  geom_bar(position = "dodge") +
-  facet_wrap(~mpaa_rating) +
-  scale_fill_brewer(name = NULL,
-                  palette = "Set2",
-                  labels = c("Not Nominated", "Nominated")) +
-  labs(x = NULL, y = NULL,
-       title = "Best Picture Nominations by Rating") +
+df %>% count(release_date.month, Oscar_Best_Picture_nominated) %>% drop_na() %>% 
+  filter(Oscar_Best_Picture_nominated == "Yes") %>% 
+  select(1, 3) %>% 
+  ggplot(aes(release_date.month, n)) +
+  geom_col(aes(fill = release_date.month)) +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  labs(title = "Total Number of Oscar Best Picture Nominees, By Month of Release",
+       subtitle = "Films Released during 2000–2017",
+       x = "Calendar Month",
+       y = NULL) +
   theme_classic() +
-  theme(legend.position = "top",
-        legend.direction = "horizontal",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  vjust = 0,
-                                  face = "bold"))
-```
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 
-This plot portrays that there are a lot of R-rated films represented in this dataset; this rating category has the most pictures not nominated as well as nominated.
-
-```{r}
-movies_1 <- movies %>% 
-  mutate(thtr_rel_month = month(thtr_rel_month, label = TRUE))
-
-movies_1 %>% 
-  ggplot(aes(
-    x = thtr_rel_month,
-    fill = best_pic_nom
-  )) +
-  geom_bar(position = "stack") +
-  scale_fill_brewer(name = NULL,
-                    palette = "Set2",
-                    labels = c("Not Nominated", "Nominated")) +
-  labs(x = NULL, y = NULL,
-       title = "Best Picture Nominations by Month Released in Theaters") +
+df %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na() %>% 
+  filter(Oscar_Best_Picture_won == "Yes") %>% 
+  select(1, 3) %>% 
+  ggplot(aes(release_date.month, n)) +
+  geom_col(aes(fill = release_date.month)) +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  labs(title = "Total Number of Oscar Best Picture Winners, By Month of Release",
+       subtitle = "Films Released during 2000–2017",
+       x = "Calendar Month",
+       y = NULL) +
   theme_classic() +
-  theme(legend.position = "top",
-        legend.direction = "horizontal",
-        plot.title = element_text(size = 12,
-                                  hjust = 0.5,
-                                  vjust = 0,
-                                  face = "bold"))
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Above, we see that movies that were released in theaters in December had the most nominations in comparison to other months; this may be due to the fact that the Oscars typically takes place near the end of the year. 
+Interestingly, the distribution for the total number of Oscar Best Picture nominees/winners over the course of the calendar year is bimodal, with some significant points of "missing data". For reference, during 2000--2017, the period of eligibility for each award show is the full previous calendar year from January 1st to December 31st. The 2017 Academy Awards considered films released between January 1, 2016 to December 31, 2016, for example. Nominations are often announced in January (right after the cutoff date) and the show occurs at the end of February.
 
-# Conclusion
+Notably, a majority of the nominees and winners were released in October, November, and December. This is mostly due to having a release so close to the cutoff date, which ups the memorability and relevance of the film by the time the nominations come in. There are also a significant number of nominees and winners released in the month of January. While that is a considerably long time from the end of eligibility period, the culture surrounding media during the new year probably increases a film's longevity in the public opinion.
 
-Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
+The month of release could be an important factor in our predictions. However, it tends to be difficult to smoothly incorporate date variables into recipes (even with `step_date()`), so we should keep that in mind before committing too heavily to this variable.
+
+## *Next Steps*
+
+Now that we have performed a thorough exploratory analysis on our data set, we are more understanding of the different variables and therefore better equipped to feature engineer and develop a well-performing model. Since this is a classification problem, we will focus on the boosted tree, multilayer perceptron, neural network, logistic regression, and random forest algorithms, which have all performed well on our labs in the past.
+
+# *Machine Learning*
+
+## *Feature Engineering, Data Splitting, and Model Fitting*
+
+load all of our thingies in data/processed
+
+## *Results*
+
+load stuff here to
+
+# *Conclusion*
