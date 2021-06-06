@@ -7,6 +7,8 @@ library(tictoc)
 oscars_data <- read_csv("data/Oscars-demographics-DFE.csv")
 potential_data <- read_csv("data/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
+set.seed(101)
+
 # Oscar nominated: 0 is No nomination and 1 is one or more nominations
 potential_data$Oscar_nominated <- ifelse(potential_data$Oscar_nominated == 0, 0, 
                                          ifelse(potential_data$Oscar_nominated != 0, 1, NA))
