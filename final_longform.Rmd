@@ -155,7 +155,39 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 # *Machine Learning*
 
+<<<<<<< HEAD
 In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. First, we tested each model with two different recipes and found that the second recipe was more successful for every model.
+=======
+In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. Using cross validation, we tested each model with two different recipes, tuning different model parameters on the folds. We found that the second recipe was more successful for every model and using this recipe we obtained the following results:
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+
+rf_tuned <- read_rds("model-info/tuned/rf_tuned_best.rds")
+nn_tuned <- read_rds("model-info/tuned/nn_tuned_best.rds")
+bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
+mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
+en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
+
+tune_results <- tibble(
+  model_type = c("rf_tuned", "nn_tuned", "mlp_tuned", "en_tuned", "bt_tuned"),
+  tune_info = list(rf_tuned, nn_tuned, mlp_tuned, en_tuned, bt_tuned),
+  assessment_info = map(tune_info, collect_metrics),
+  best_model = map(tune_info, ~select_best(.x, metric = "accuracy")))
+
+tune_results %>%
+  select(model_type, assessment_info) %>%
+  unnest(assessment_info) %>%
+  filter(.metric == "accuracy") %>%
+  group_by(model_type) %>%
+  summarise(accuracy = max(mean)) %>% 
+  arrange(desc(accuracy))
+```
+
+Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set. 
+>>>>>>> cb86fa880d5c785378da3ecc70d3fb7ed68cd416
 
 ## *Feature Engineering, Data Splitting, and Model Fitting*
 
@@ -163,6 +195,38 @@ load all of our thingies in data/processed
 
 ## *Results*
 
-load stuff here to
+Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results:
+
+```{r}
+rf_training_fit <- read_rds("model-info/rf_best_model_training_fit.rds")
+oscar_test <- readRDS("data/processed/oscar_test.rds")
+
+rf_accuracy <- rf_training_fit %>% 
+  predict(oscar_test) %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  accuracy(truth = truth, estimate = .pred_class) 
+
+rf_training_fit %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_auc(truth = truth, .pred_0) %>% # roc-auc
+  bind_rows(rf_accuracy) %>% # elastic net accuracy (stored)
+  mutate(
+    Metric = .metric, # rename
+    Estimate = .estimate
+  ) %>% 
+  select(Metric, Estimate) # select
+
+rf_training_fit %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_curve(truth = truth, .pred_0) %>% 
+  autoplot()
+```
+
+
+This is a slight decrease in performance for the accuracy, however it is still relatively high and we are pleased with the overall performance. The area under the ROC-AUC curve is also fairly high at 0.923 out of 1. 
 
 # *Conclusion*
+
+In conclusion, we are pleased with the results of our model. Add more
