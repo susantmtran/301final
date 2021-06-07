@@ -33,7 +33,24 @@ We found our data set through the BigML platform, which is considered to be a po
 
 # *Exploratory Data Analysis*
 
-To start off our data analysis, we will observe the missing values, if any, using the `skimr` and `naniar` packages. The essential component of feature engineering for models is *non*-missingness, so it important that we address missing values as soon as possible.
+To start off our exploratory data analysis, we will look at the distribution of the outcome variable.
+
+```{r}
+df$Oscar_nominated <- ifelse(df$Oscar_nominated == 0, 0, 
+                                         ifelse(df$Oscar_nominated != 0, 1, NA))
+
+df %>% 
+  ggplot(aes(as_factor(Oscar_nominated))) +
+  geom_bar(fill = c("#008f69", "#2f84de"), alpha = 0.5) +
+  scale_x_discrete("Oscar Nominated", labels = c("0" = "No", "1" = "Yes")) +
+  labs( title = "Distribution of Outcome Variable: Oscar Nominated",
+        y = "Count") +
+  theme_classic()
+```
+
+We can see that the distribution of our outcome variable is slightly skewed with more movies having Oscar nominations. We will take this into account when splitting our data and will be sure to stratify based on our outcome variable.
+
+Next we will observe the missing values, if any, using the `skimr` and `naniar` packages. The essential component of feature engineering for models is *non*-missingness, so it important that we address missing values as soon as possible.
 
 ## Missingness
 
@@ -45,7 +62,7 @@ skimr::skim_without_charts(df)
 naniar::miss_var_summary(df)
 ```
 
-Given the difficult that we had with finding a data set that would work well for project and because there are a little over 100 variables for about 1000 movies, it is unsurprising that there is a significant amount of missing values in the data set. However, after taking a closer look, the variables with the highest levels of missingness are those indicating which categories movies are nominated for, and which categories movies have won awards in. Understandably, if a movie is not nominated and therefore not a winner, these categories are nonexistent and therefore irrelevant. As result, these variables will be unhelpful in creating our models and should not be included in our recipes.
+Given the difficulty that we had with finding a data set that would work well for project and because there are a little over 100 variables for about 1000 movies, it is unsurprising that there is a significant amount of missing values in the data set. However, after taking a closer look, the variables with the highest levels of missingness are those indicating which categories movies are nominated for, and which categories movies have won awards in. Understandably, if a movie is not nominated and therefore not a winner, these categories are nonexistent and therefore irrelevant. As result, these variables will be unhelpful in creating our models and should not be included in our recipes.
 
 Without those variables in mind, the highest percentage of missingness is 10% for the `popularity` variable. The general rule of thumb for missingness is about 20%, so we are good to consider the remaining variables and likely impute during the recipe steps to solve any additional problems.
 
@@ -138,12 +155,74 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 # *Machine Learning*
 
+In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. Using cross validation, we tested each model with two different recipes, tuning different model parameters on the folds. We found that the second recipe was more successful for every model and using this recipe we obtained the following results:
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+
+rf_tuned <- read_rds("model-info/tuned/rf_tuned_best.rds")
+nn_tuned <- read_rds("model-info/tuned/nn_tuned_best.rds")
+bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
+mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
+en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
+
+tune_results <- tibble(
+  model_type = c("rf_tuned", "nn_tuned", "mlp_tuned", "en_tuned", "bt_tuned"),
+  tune_info = list(rf_tuned, nn_tuned, mlp_tuned, en_tuned, bt_tuned),
+  assessment_info = map(tune_info, collect_metrics),
+  best_model = map(tune_info, ~select_best(.x, metric = "accuracy")))
+
+tune_results %>%
+  select(model_type, assessment_info) %>%
+  unnest(assessment_info) %>%
+  filter(.metric == "accuracy") %>%
+  group_by(model_type) %>%
+  summarise(accuracy = max(mean)) %>% 
+  arrange(desc(accuracy))
+```
+
+Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set. 
+
 ## *Feature Engineering, Data Splitting, and Model Fitting*
 
 load all of our thingies in data/processed
 
 ## *Results*
 
-load stuff here to
+Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results:
+
+```{r}
+rf_training_fit <- read_rds("model-info/rf_best_model_training_fit.rds")
+oscar_test <- readRDS("data/processed/oscar_test.rds")
+
+rf_accuracy <- rf_training_fit %>% 
+  predict(oscar_test) %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  accuracy(truth = truth, estimate = .pred_class) 
+
+rf_training_fit %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_auc(truth = truth, .pred_0) %>% # roc-auc
+  bind_rows(rf_accuracy) %>% # elastic net accuracy (stored)
+  mutate(
+    Metric = .metric, # rename
+    Estimate = .estimate
+  ) %>% 
+  select(Metric, Estimate) # select
+
+rf_training_fit %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_curve(truth = truth, .pred_0) %>% 
+  autoplot()
+```
+
+
+This is a slight decrease in performance for the accuracy, however it is still relatively high and we are pleased with the overall performance. The area under the ROC-AUC curve is also fairly high at 0.923 out of 1. 
 
 # *Conclusion*
+
+In conclusion, we are pleased with the results of our model. Add more

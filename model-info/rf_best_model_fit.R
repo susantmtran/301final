@@ -42,6 +42,7 @@ rf_workflow_tuned <- rf_workflow %>%
 # fit ---------------------------------------------------------------------
 rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
 rf_fit_results
+write_rds(rf_fit_results, "model-info/rf_best_model_training_fit.rds")
 
 
 # test-set-performance ----------------------------------------------------
