@@ -155,9 +155,6 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 # *Machine Learning*
 
-<<<<<<< HEAD
-In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. First, we tested each model with two different recipes and found that the second recipe was more successful for every model.
-=======
 In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. Using cross validation, we tested each model with two different recipes, tuning different model parameters on the folds. We found that the second recipe was more successful for every model and using this recipe we obtained the following results:
 
 ```{r}
@@ -187,7 +184,6 @@ tune_results %>%
 ```
 
 Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set. 
->>>>>>> cb86fa880d5c785378da3ecc70d3fb7ed68cd416
 
 ## *Feature Engineering, Data Splitting, and Model Fitting*
 
