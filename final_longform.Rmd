@@ -33,7 +33,7 @@ We found our data set through the BigML platform, which is considered to be a po
 
 # *Exploratory Data Analysis*
 
-To start off our exploratory data analysis, we will look at the distribution of the outcome variable. 
+To start off our exploratory data analysis, we will look at the distribution of the outcome variable.
 
 ```{r}
 df$Oscar_nominated <- ifelse(df$Oscar_nominated == 0, 0, 
@@ -48,7 +48,7 @@ df %>%
   theme_classic()
 ```
 
-We can see that the distribution of our outcome variable is slightly skewed with more movies having Oscar nominations. We will take this into account when splitting our data and will be sure to stratify based on our outcome variable. 
+We can see that the distribution of our outcome variable is slightly skewed with more movies having Oscar nominations. We will take this into account when splitting our data and will be sure to stratify based on our outcome variable.
 
 Next we will observe the missing values, if any, using the `skimr` and `naniar` packages. The essential component of feature engineering for models is *non*-missingness, so it important that we address missing values as soon as possible.
 
@@ -155,7 +155,7 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 # *Machine Learning*
 
-In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. First, we tested each model with two different recipes and found that the second recipe was more successful for every model. 
+In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. First, we tested each model with two different recipes and found that the second recipe was more successful for every model.
 
 ## *Feature Engineering, Data Splitting, and Model Fitting*
 
