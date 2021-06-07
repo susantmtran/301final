@@ -183,7 +183,7 @@ tune_results %>%
   arrange(desc(accuracy))
 ```
 
-Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set. 
+Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set.
 
 ## *Feature Engineering, Data Splitting, and Model Fitting*
 
@@ -220,9 +220,10 @@ rf_training_fit %>%
   autoplot()
 ```
 
-
-This is a slight decrease in performance for the accuracy, however it is still relatively high and we are pleased with the overall performance. The area under the ROC-AUC curve is also fairly high at 0.923 out of 1. 
+We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy, although it is still relatively high. The area under the ROC-AUC curve is also fairly high at 0.923 out of 1, which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination.
 
 # *Conclusion*
 
-In conclusion, we are pleased with the results of our model. Add more
+Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. Additional data resources that could have helped improve model performance include a codebook - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped.
+
+Add more
