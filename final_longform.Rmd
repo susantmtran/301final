@@ -225,7 +225,3 @@ We included both ROC-AUC and accuracy as performance metrics, seeing a slight de
 # *Conclusion*
 
 Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, especially given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. A codebook is an additional resource that could have helped improve model performance - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped, leaving us to our speculation. Although most were relatively straightforward which allowed us to make reasonable assumptions, next steps could include gaining that additional information which may be useful.
-
-# Citations
-
-"Movies 2000-2017." <https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b>

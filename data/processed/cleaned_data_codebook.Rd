@@ -31,7 +31,7 @@ their respective film nominations and awards for 1183 pieces of media (released 
 %%  ~~ If necessary, more details than the __description__ above ~~ idk if necessary
 }
 \source{
-cite the kaggle here
+BigML. "Movies 2000-2017." https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b
 }
 \references{
 %%  ~~ possibly secondary sources and usages ~~ idk if necessary
