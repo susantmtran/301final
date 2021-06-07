@@ -1,37 +1,42 @@
-\name{cleaned_data_set}
+\name{cleaned_data_set {301final}}
 \alias{cleaned_data_set}
 \docType{data}
 
 \title{
-Collection of Award Nominations and Wins for Films Released 2000–2017
+Collection of Award Nominations and Wins for Films
 }
 \description{
-describe here
+The data was extracted from ______, and comprises 119 different statistics about films and
+their respective film nominations and awards for 1183 pieces of media (released 2000–2017).
 }
 \usage{cleaned_data_set <- readRDS("processed/cleaned_data_set.rds")}
 \format{
-  A data frame with 1183 observations across 119 variables.
+  A data frame with 1183 observations on 119 variables, with a focus on the # variables required
+  for the recipe building process. All variables are numeric or character except for one, which    is a factor.
   \describe{
-    \item{\code{id}}{an integer variable identifying each song. This is directly corrected to the row number of a given song.}
-    \item{\code{danceability}}{a numeric variable ranging from 0.0 to 1.0 describing how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.}
-    \item{\code{energy}}{a numeric variable ranging from 0.0 to 1.0 representing a perceptual measure of intensity and activity. Typically, energetic tracks feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale.}
-    \item{\code{key}}{a numeric variable estimating the overall key of the track. Integers map to pitches using standard Pitch Class notation . E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on.}
-    \item{\code{loudness}}{a numeric variable representing the overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks.}
-    \item{\code{mode}}{a categorical variable indicating the modality (major or minor) of a track, the type of scale from which its melodic content is derived.}
-    \item{\code{speechiness}}{a numeric variable ranging from 0.0 to 1.0 detecting the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value.}
+    \item{\code{Oscar_nominated}}{the outcome variable in factor form indicating__}
+    \item{\code{certificate}}{a numeric variable ranging from 0.0 to 1.0 describing how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.}
+    \item{\code{duration}}{a numeric/character variable indicating ____}
+    \item{\code{genre}}{a numeric/character variable indicating ____}
+    \item{\code{rate}}{a numeric/character variable indicating ____}
+    \item{\code{metascore}}{a numeric/character variable indicating ____}
+    \item{\code{gross}}{a numeric/character variable indicating ____}
+    \item{\code{awards_wins}}{a numeric/character variable indicating ____}
+    \item{\code{awards_nominations}}{a numeric/character variable indicating ____}
+    \item{\code{Golden_Globes_nominated, \cr Critics_Choice_nominated, \cr
+    BAFTA_nominated}}{a numeric/character variable indicating ____}
   }
 }
 \details{
-%%  ~~ If necessary, more details than the __description__ above ~~
+%%  ~~ If necessary, more details than the __description__ above ~~ idk if necessary
 }
 \source{
-Molina, A. (2019, April). Spotify music genre list and 80k songs/tracks, Version 6. Retrieved January 12, 2021 from https://www.kaggle.com/grasslover/spotify-music-genre-list/version/6.
+cite the kaggle here
 }
 \references{
-%%  ~~ possibly secondary sources and usages ~~
+%%  ~~ possibly secondary sources and usages ~~ idk if necessary
 }
 \examples{
-data(blah)
-## maybe str(blah) ; plot(blah) ...
+just paste the code for the ggplot or the recipe idk
 }
 \keyword{301final}
