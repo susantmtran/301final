@@ -16,7 +16,7 @@ editor_options:
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 ```
 
-# *Data Set*
+# *Introduction*
 
 ```{r}
 # load packages
@@ -29,7 +29,7 @@ set.seed(101)
 df <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 ```
 
-We found our data set through the BigML platform, which is considered to be a powerful machine learning service in the data science world. There are [multiple data sets](https://bigml.com/user/academy_awards/gallery/datasets) related to the Academy Awards on BigML, whose users scraped the data from [IMDb](https://www.imdb.com/), a well-known online database on movies, television shows, and so forth. We are focusing the [2000-2017](https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b) time period of nominations and awards, and plan to predict whether or not a film has received an Oscar nomination (in any category) depending on a few select variables.
+We discovered our data set through the BigML platform, which is considered to be a powerful machine learning service in the data science world. There are [multiple data sets](https://bigml.com/user/academy_awards/gallery/datasets) related to the Academy Awards on BigML, whose users scraped the data from [IMDb](https://www.imdb.com/), a well-known online database on movies, television shows, and so forth. We are focusing the [2000-2017](https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b) time period of nominations and awards, and plan to predict whether or not a film has received an Oscar nomination (in any category) depending on a few select variables. We chose this data set due to our shared interest in film as well as our curiosity regarding how well a nomination could be predicted when limited to the variables in the data.
 
 # *Exploratory Data Analysis*
 
@@ -224,6 +224,6 @@ We included both ROC-AUC and accuracy as performance metrics, seeing a slight de
 
 # *Conclusion*
 
-Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. Additional data resources that could have helped improve model performance include a codebook - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped.
+Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, especially given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. A codebook is an additional resource that could have helped improve model performance - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped, leaving us to our speculation. Although most were relatively straightforward which allowed us to make reasonable assumptions, next steps could include gaining that additional information which may be useful.
 
-Add more
+Add more?
