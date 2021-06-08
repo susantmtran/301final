@@ -625,7 +625,7 @@ rf_fit_results %&gt;%
 ##   &lt;chr&gt;       &lt;dbl&gt;
 ## 1 roc_auc     0.923
 ## 2 accuracy    0.868</code></pre>
-<p>We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (<code>0.868</code>), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (<code>0.923</code>), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC curve.</p>
+<p>We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (<code>0.868</code>), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (<code>0.923</code>), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC AUC through the ROC curve.</p>
 <pre class="r"><code># ROC-AUC -----------------------------------------------------------------
 rf_fit_results %&gt;% 
   predict(new_data = oscar_test, type = &quot;prob&quot;) %&gt;% 
