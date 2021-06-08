@@ -14,20 +14,31 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
+
+# load-packages ----------------------------------------------------------
+library(tidymodels)
+library(tidyverse)
+
+# load-data --------------------------------------------------------------
+potential_data <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
+
+# load-objects -----------------------------------------------------------
+oscar_recipe <- readRDS("model-info/oscar_recipe.rds")
+oscar_train <- readRDS("data/processed/oscar_train.rds")
+oscar_test <- readRDS("data/processed/oscar_test.rds")
+oscar_folds <- readRDS("data/processed/oscar_folds.rds")
+
+rf_tuned <- read_rds("model-info/tuned/rf_tuned_best.rds")
+nn_tuned <- read_rds("model-info/tuned/nn_tuned_best.rds")
+bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
+mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
+en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
+
+# set-seed ---------------------------------------------------------------
+set.seed(101)
 ```
 
 # *Introduction*
-
-```{r}
-# load packages
-library(tidyverse)
-
-# set seed
-set.seed(101)
-
-# load data
-df <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
-```
 
 We discovered our data set through the BigML platform, which is considered to be a powerful machine learning service in the data science world. There are [multiple data sets](https://bigml.com/user/academy_awards/gallery/datasets) related to the Academy Awards on BigML, whose users scraped the data from [IMDb](https://www.imdb.com/), a well-known online database on movies, television shows, and so forth. We are focusing the [2000-2017](https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b) time period of nominations and awards, and plan to predict whether or not a film has received an Oscar nomination (in any category) depending on a few select variables. We chose this data set due to our shared interest in film as well as our curiosity regarding how well a nomination could be predicted when limited to the variables in the data.
 
@@ -36,10 +47,10 @@ We discovered our data set through the BigML platform, which is considered to be
 To start off our exploratory data analysis, we will look at the distribution of the outcome variable.
 
 ```{r}
-df$Oscar_nominated <- ifelse(df$Oscar_nominated == 0, 0, 
-                                         ifelse(df$Oscar_nominated != 0, 1, NA))
+potential_data$Oscar_nominated <- ifelse(potential_data$Oscar_nominated == 0, 0, 
+                                         ifelse(potential_data$Oscar_nominated != 0, 1, NA))
 
-df %>% 
+potential_data %>% 
   ggplot(aes(as_factor(Oscar_nominated))) +
   geom_bar(fill = c("#008f69", "#2f84de"), alpha = 0.5) +
   scale_x_discrete("Oscar Nominated", labels = c("0" = "No", "1" = "Yes")) +
@@ -55,11 +66,11 @@ Next we will observe the missing values, if any, using the `skimr` and `naniar` 
 ## Missingness
 
 ```{r results='hide'}
-skimr::skim_without_charts(df)
+skimr::skim_without_charts(potential_data)
 ```
 
 ```{r}
-naniar::miss_var_summary(df)
+naniar::miss_var_summary(potential_data)
 ```
 
 Given the difficulty that we had with finding a data set that would work well for project and because there are a little over 100 variables for about 1000 movies, it is unsurprising that there is a significant amount of missing values in the data set. However, after taking a closer look, the variables with the highest levels of missingness are those indicating which categories movies are nominated for, and which categories movies have won awards in. Understandably, if a movie is not nominated and therefore not a winner, these categories are nonexistent and therefore irrelevant. As result, these variables will be unhelpful in creating our models and should not be included in our recipes.
@@ -71,7 +82,7 @@ Note that the results of `skimr::skim_without_charts()` are hidden due to the le
 ## Trends
 
 ```{r}
-df %>% ggplot(aes(awards_nominations, awards_wins)) +
+potential_data %>% ggplot(aes(awards_nominations, awards_wins)) +
   geom_jitter(aes(color = Oscar_Best_Picture_nominated), alpha = 0.5) +
   scale_color_manual("Nominated for Oscars Best Picture?",
                      values = c("#008f69", "#2f84de"),
@@ -94,7 +105,7 @@ In the plot above, we can observe that the total number of nominations that a fi
 ## Notable Elements
 
 ```{r}
-df %>% ggplot(aes(rate, metascore)) +
+potential_data %>% ggplot(aes(rate, metascore)) +
   geom_jitter(alpha = 0.5, color = "#008f69") +
   geom_smooth(color = "black") +
   labs(title = "IMDb Rating vs Metascore",
@@ -112,7 +123,7 @@ df %>% ggplot(aes(rate, metascore)) +
 IMDb ratings reflect their user input, which does not necessarily come from renowned and/or prestigious film critics. In contrast, the metascore is a conglomerate of the different famous film critic organizations. Again, these two values are positively correlated but with enough variation so that they are distinct enough to use in our recipe(s). `step_corr()` might even be useful.
 
 ```{r}
-df %>% count(release_date.month, Oscar_Best_Picture_nominated) %>% drop_na() %>% 
+potential_data %>% count(release_date.month, Oscar_Best_Picture_nominated) %>% drop_na() %>% 
   filter(Oscar_Best_Picture_nominated == "Yes") %>% 
   select(1, 3) %>% 
   ggplot(aes(release_date.month, n)) +
@@ -127,7 +138,7 @@ df %>% count(release_date.month, Oscar_Best_Picture_nominated) %>% drop_na() %>%
         plot.title = element_text(face = "bold", hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5))
 
-df %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na() %>% 
+potential_data %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na() %>% 
   filter(Oscar_Best_Picture_won == "Yes") %>% 
   select(1, 3) %>% 
   ggplot(aes(release_date.month, n)) +
@@ -149,25 +160,190 @@ Notably, a majority of the nominees and winners were released in October, Novemb
 
 The month of release could be an important factor in our predictions. However, it tends to be difficult to smoothly incorporate date variables into recipes (even with `step_date()`), so we should keep that in mind before committing too heavily to this variable.
 
-## *Next Steps*
+## Next Steps
 
 Now that we have performed a thorough exploratory analysis on our data set, we are more understanding of the different variables and therefore better equipped to feature engineer and develop a well-performing model. Since this is a classification problem, we will focus on the boosted tree, multilayer perceptron, neural network, logistic regression, and random forest algorithms, which have all performed well on our labs in the past.
 
-# *Machine Learning*
+<br>
 
-In order to produce the best results, we tested five different models: K-nearest neighbor, boosted tree, random forest, elastic net, and neural net. Using cross validation, we tested each model with two different recipes, tuning different model parameters on the folds. We found that the second recipe was more successful for every model and using this recipe we obtained the following results:
+
+# *Feature Engineering*
+
+Before beginning the feature engineering process, we split the data using 70% for the training set (`oscar_train`) and 30% for the testing set (`oscar_test`). We then resampled our training data set (`oscar_folds`) using V-fold cross-validation with five folds and three repeats, stratified by our outcome variable, `Oscar_nominated`.
+
+```{r, eval=FALSE}
+oscar_split <- initial_split(potential_data, prop = 0.7, strata = Oscar_nominated)
+oscar_train <- training(oscar_split) 
+oscar_test <- testing(oscar_split)
+oscar_folds <- vfold_cv(potential_data, v = 5, repeats = 3, strata = Oscar_nominated)
+```
+
+Using our training data set, we created a recipe using `step_impute_bag()`, `step_dummy()`, and `step_normalize()`. We included 10 predictors: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` You can read more about each of these variables in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
+
+```{r, eval=FALSE}
+oscar_recipe <- recipe(
+  Oscar_nominated ~ duration + votes + rate + metascore + gross 
+    + awards_wins + awards_nominations + Golden_Globes_nominated +
+    Critics_Choice_nominated + BAFTA_nominated, 
+  data = oscar_train
+) %>%
+  step_impute_bag(metascore, gross) %>%
+  step_dummy(all_nominal(), -all_outcomes(), one_hot = TRUE) %>%
+  step_normalize(all_numeric()) 
+```
+
+<br>
+
+
+# *Machine Learning and Model Workflows*
+
+For this project, we used five algorithms to compete the following model types against one another in order to produce the best results: boosted tree (`bt_model`), elastic net (`en_model`), K-nearest neighbors (`nn_model`), multilayer perceptron (`mlp_model`), and random forest (`rf_model`). As you can see in `final/model-info/drafts`, we tested each model with multiple recipes and parameter values before finalizing the recipe that is used in each tuning script in `final/model-info/best-models`. The finalized recipe is used for each model's workflow below.
+
+## Boosted Tree
+
+For our boosted tree model, we tuned the parameters `mtry`, `min_n`, and `learn_rate`, using the default values for `min_n` but updating the values for `mtry` and `learn_rate`. We then defined our tuning grid and workflow in order to tune our model. 
+
+```{r, eval=FALSE}
+# define-model
+bt_model <- boost_tree(
+  mode = "classification",
+  mtry = tune(),
+  min_n = tune(),
+  learn_rate = tune()
+) %>%
+  set_engine("xgboost")
+
+# define-tuning-grid
+bt_params <- parameters(bt_model) %>%
+  update(mtry = mtry(c(1, 10)),
+         learn_rate = learn_rate(range = c(-5, -0.2)))
+bt_grid <- grid_regular(bt_params, levels = 5)
+
+# define-workflow
+bt_workflow <- workflow() %>%
+  add_model(bt_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuning
+bt_tuned <- bt_workflow %>% 
+  tune_grid(oscar_folds, grid = bt_grid)
+```
+
+## Elastic Net
+
+For our elastic net model, we tuned the parameters `mixture` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model. 
+
+```{r, eval=FALSE}
+# define-model
+en_model <- logistic_reg(
+  mixture = tune(),
+  penalty = tune()
+) %>%
+  set_engine("glmnet")
+
+# define-tuning-grid
+en_params <- parameters(en_model)
+en_grid <- grid_regular(en_params, levels = 5)
+
+# define-workflow
+en_workflow <- workflow() %>%
+  add_model(en_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuning
+en_tuned <- en_workflow %>% 
+  tune_grid(oscar_folds, grid = en_grid)
+```
+
+## KNN
+
+For our K-nearest neighbors model, we tuned the parameters `neighbors`, using its default values. We then defined our tuning grid and workflow in order to tune our model. 
+
+```{r, eval=FALSE}
+# define-model
+nn_model <- nearest_neighbor(
+  mode = "classification", 
+  neighbors = tune()
+) %>%
+  set_engine("kknn")
+
+# define-tuning-grid
+nn_params <- parameters(nn_model) 
+nn_grid <- grid_regular(nn_params, levels = 5)
+
+# define-workflow
+nn_workflow <- workflow() %>%
+  add_model(nn_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuning
+nn_tuned <- nn_workflow %>%
+  tune_grid(oscar_folds, grid = nn_grid)
+```
+
+## Multilayer perceptron
+
+For our multilayer perceptron model, we tuned the parameters `hidden_units` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model. 
+
+```{r, eval=FALSE}
+# define-model
+mlp_model <- mlp(
+  mode = "classification",
+  hidden_units = tune(),
+  penalty = tune()
+) %>%
+  set_engine("nnet")
+
+# define-tuning-grid
+mlp_params <- parameters(mlp_model)
+mlp_grid <- grid_regular(mlp_params, levels = 5)
+
+# define-workflow
+mlp_workflow <- workflow() %>%
+  add_model(mlp_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuning
+mlp_tuned <- mlp_workflow %>% 
+  tune_grid(oscar_folds, grid = mlp_grid)
+```
+
+## Random Forest
+
+For our random forest model, we tuned the parameters `mtry` and `min_n`, updating `mtry` and using the default values for `min_n`. We then defined our tuning grid and workflow in order to tune our model. 
+
+```{r, eval=FALSE}
+# define-model
+rf_model <- rand_forest(mode = "classification",
+                        mtry = tune(),
+                        min_n = tune()) %>%
+  set_engine("ranger")
+
+# define-tuning-grid
+rf_params <- parameters(rf_model) %>%
+  update(mtry = mtry(c(1, 10)))
+rf_grid <- grid_regular(rf_params, levels = 5)
+
+# define-workflow
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuning
+rf_tuned <- rf_workflow %>% 
+  tune_grid(oscar_folds, grid = rf_grid)
+```
+
+<br>
+
+
+# *Model Assessment* 
+
+To select the best model for this classification problem, we used the accuracy metric. As you can see from the tibble below, our random forest model performed the best --- but only slightly better than our boosted tree model, which had an accuracy of `0.874` --- with an accuracy of `0.875`. 
+
+Our best multilayer perceptron and elastic net models performed comparably, both with an accuracy around `0.86`. However, our best K-nearest neighbors model performed the worst with an accuracy of `0.846`, which is still a fairly good result. 
 
 ```{r}
-library(tidyverse)
-library(tidymodels)
-
-
-rf_tuned <- read_rds("model-info/tuned/rf_tuned_best.rds")
-nn_tuned <- read_rds("model-info/tuned/nn_tuned_best.rds")
-bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
-mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
-en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
-
 tune_results <- tibble(
   model_type = c("rf_tuned", "nn_tuned", "mlp_tuned", "en_tuned", "bt_tuned"),
   tune_info = list(rf_tuned, nn_tuned, mlp_tuned, en_tuned, bt_tuned),
@@ -183,26 +359,80 @@ tune_results %>%
   arrange(desc(accuracy))
 ```
 
-Based on these findings, random forest was our best performing model. Next we fit this winning model on the entire training set and then the testing set.
+Based on these findings, the random forest was our best performing model. Thus, we can fit the best model on the entire training set and then the testing set.
 
-## *Feature Engineering, Data Splitting, and Model Fitting*
+<br>
 
-load all of our thingies in data/processed
 
-## *Results*
+# *Model Fit and Results*
 
-Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results:
+Now that we have selected the best-performing model from our trials, we can finalize our model workflow using the best tuned model and the entire training data set. 
+
+```{r, include=FALSE}
+# define-model ------------------------------------------------------------
+rf_model <- rand_forest(mode = "classification",
+                        mtry = tune(),
+                        min_n = tune()) %>%
+  set_engine("ranger")
+
+
+# define-tuning-grid ------------------------------------------------------
+rf_params <- parameters(rf_model) %>%
+  update(mtry = mtry(c(1, 10)))
+
+rf_grid <- grid_regular(rf_params, levels = 5)
+
+
+# workflow ----------------------------------------------------------------
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuned-workflow ----------------------------------------------------------------
+rf_workflow_tuned <- rf_workflow %>% 
+  finalize_workflow(select_best(rf_tuned, metric = "accuracy"))
+
+# fit ---------------------------------------------------------------------
+rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
+```
+
+```{r, eval=FALSE}
+# define-model ------------------------------------------------------------
+rf_model <- rand_forest(mode = "classification",
+                        mtry = tune(),
+                        min_n = tune()) %>%
+  set_engine("ranger")
+
+
+# define-tuning-grid ------------------------------------------------------
+rf_params <- parameters(rf_model) %>%
+  update(mtry = mtry(c(1, 10)))
+
+rf_grid <- grid_regular(rf_params, levels = 5)
+
+
+# workflow ----------------------------------------------------------------
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuned-workflow ----------------------------------------------------------------
+rf_workflow_tuned <- rf_workflow %>% 
+  finalize_workflow(select_best(rf_tuned, metric = "accuracy"))
+
+# fit ---------------------------------------------------------------------
+rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
+```
+
+Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results. 
 
 ```{r}
-rf_training_fit <- read_rds("model-info/rf_best_model_training_fit.rds")
-oscar_test <- readRDS("data/processed/oscar_test.rds")
-
-rf_accuracy <- rf_training_fit %>% 
+rf_accuracy <- rf_fit_results %>% 
   predict(oscar_test) %>% 
   bind_cols(truth = oscar_test$Oscar_nominated) %>% 
   accuracy(truth = truth, estimate = .pred_class) 
 
-rf_training_fit %>% 
+rf_fit_results %>% 
   predict(new_data = oscar_test, type = "prob") %>% 
   bind_cols(truth = oscar_test$Oscar_nominated) %>% 
   roc_auc(truth = truth, .pred_0) %>% # roc-auc
@@ -212,16 +442,24 @@ rf_training_fit %>%
     Estimate = .estimate
   ) %>% 
   select(Metric, Estimate) # select
+```
 
-rf_training_fit %>% 
+We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (`0.868`), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (`0.923`), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC AUC through the ROC curve. 
+
+```{r}
+# ROC-AUC -----------------------------------------------------------------
+rf_fit_results %>% 
   predict(new_data = oscar_test, type = "prob") %>% 
   bind_cols(truth = oscar_test$Oscar_nominated) %>% 
   roc_curve(truth = truth, .pred_0) %>% 
   autoplot()
 ```
 
-We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy, although it is still relatively high. The area under the ROC-AUC curve is also fairly high at 0.923 out of 1, which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination.
+<br>
+
 
 # *Conclusion*
 
 Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, especially given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. A codebook is an additional resource that could have helped improve model performance - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped, leaving us to our speculation. Although most were relatively straightforward which allowed us to make reasonable assumptions, next steps could include gaining that additional information which may be useful.
+
+
