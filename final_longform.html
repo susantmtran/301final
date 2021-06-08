@@ -579,30 +579,30 @@ tune_results %&gt;%
 <div id="model-fit-and-results" class="section level1">
 <h1><em>Model Fit and Results</em></h1>
 <p>Now that we have selected the best-performing model from our trials, we can finalize our model workflow using the best tuned model and the entire training data set.</p>
-<pre class="r"><code># define-model ------------------------------------------------------------
+<pre class="r"><code># define-model
 rf_model &lt;- rand_forest(mode = &quot;classification&quot;,
                         mtry = tune(),
                         min_n = tune()) %&gt;%
   set_engine(&quot;ranger&quot;)
 
 
-# define-tuning-grid ------------------------------------------------------
+# define-tuning-grid
 rf_params &lt;- parameters(rf_model) %&gt;%
   update(mtry = mtry(c(1, 10)))
 
 rf_grid &lt;- grid_regular(rf_params, levels = 5)
 
 
-# workflow ----------------------------------------------------------------
+# workflow
 rf_workflow &lt;- workflow() %&gt;%
   add_model(rf_model) %&gt;%
   add_recipe(oscar_recipe)
 
-# tuned-workflow ----------------------------------------------------------------
+# tuned-workflow
 rf_workflow_tuned &lt;- rf_workflow %&gt;% 
   finalize_workflow(select_best(rf_tuned, metric = &quot;accuracy&quot;))
 
-# fit ---------------------------------------------------------------------
+# fit 
 rf_fit_results &lt;- fit(rf_workflow_tuned, oscar_train)</code></pre>
 <p>Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results.</p>
 <pre class="r"><code>rf_accuracy &lt;- rf_fit_results %&gt;% 

@@ -368,59 +368,31 @@ Based on these findings, the random forest was our best performing model. Thus, 
 
 Now that we have selected the best-performing model from our trials, we can finalize our model workflow using the best tuned model and the entire training data set. 
 
-```{r, include=FALSE}
-# define-model ------------------------------------------------------------
+```{r}
+# define-model
 rf_model <- rand_forest(mode = "classification",
                         mtry = tune(),
                         min_n = tune()) %>%
   set_engine("ranger")
 
 
-# define-tuning-grid ------------------------------------------------------
+# define-tuning-grid
 rf_params <- parameters(rf_model) %>%
   update(mtry = mtry(c(1, 10)))
 
 rf_grid <- grid_regular(rf_params, levels = 5)
 
 
-# workflow ----------------------------------------------------------------
+# workflow
 rf_workflow <- workflow() %>%
   add_model(rf_model) %>%
   add_recipe(oscar_recipe)
 
-# tuned-workflow ----------------------------------------------------------------
+# tuned-workflow
 rf_workflow_tuned <- rf_workflow %>% 
   finalize_workflow(select_best(rf_tuned, metric = "accuracy"))
 
-# fit ---------------------------------------------------------------------
-rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
-```
-
-```{r, eval=FALSE}
-# define-model ------------------------------------------------------------
-rf_model <- rand_forest(mode = "classification",
-                        mtry = tune(),
-                        min_n = tune()) %>%
-  set_engine("ranger")
-
-
-# define-tuning-grid ------------------------------------------------------
-rf_params <- parameters(rf_model) %>%
-  update(mtry = mtry(c(1, 10)))
-
-rf_grid <- grid_regular(rf_params, levels = 5)
-
-
-# workflow ----------------------------------------------------------------
-rf_workflow <- workflow() %>%
-  add_model(rf_model) %>%
-  add_recipe(oscar_recipe)
-
-# tuned-workflow ----------------------------------------------------------------
-rf_workflow_tuned <- rf_workflow %>% 
-  finalize_workflow(select_best(rf_tuned, metric = "accuracy"))
-
-# fit ---------------------------------------------------------------------
+# fit 
 rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
 ```
 
