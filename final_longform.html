@@ -290,7 +290,7 @@ div.tocify {
 </div>
 <div id="exploratory-data-analysis" class="section level1">
 <h1><em>Exploratory Data Analysis</em></h1>
-<p>To start off our exploratory data analysis, we will look at the distribution of the outcome variable.</p>
+<p>To start off our exploratory data analysis, we will look at the distribution of the outcome variable <code>Oscar_nominated</code>. <code>Oscar_nominated</code> is a categorical variable that we converted into a factor with two levels: <code>0</code> and <code>1</code>. <code>0</code> represents movies that received no Oscar nominations, and <code>1</code> represents movies that were nominated for at least one Oscar category.</p>
 <pre class="r"><code>potential_data$Oscar_nominated &lt;- ifelse(potential_data$Oscar_nominated == 0, 0, 
                                          ifelse(potential_data$Oscar_nominated != 0, 1, NA))
 

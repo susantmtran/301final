@@ -44,7 +44,7 @@ We discovered our data set through the BigML platform, which is considered to be
 
 # *Exploratory Data Analysis*
 
-To start off our exploratory data analysis, we will look at the distribution of the outcome variable.
+To start off our exploratory data analysis, we will look at the distribution of the outcome variable `Oscar_nominated`. `Oscar_nominated` is a categorical variable that we converted into a factor with two levels: `0` and `1`. `0` represents movies that received no Oscar nominations, and `1` represents movies that were nominated for at least one Oscar category. 
 
 ```{r}
 potential_data$Oscar_nominated <- ifelse(potential_data$Oscar_nominated == 0, 0, 
