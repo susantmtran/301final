@@ -19,12 +19,12 @@ their respective film nominations and awards for 1183 pieces of media (released 
     \item{\code{duration}}{a numeric variable indicating the number of minutes of the film.}
     \item{\code{genre}}{a character variable indicating the genre of the film.}
     \item{\code{rate}}{a numeric variable indicating the IMDb rating of the film.}
-    \item{\code{metascore}}{a numeric variable indicating the conglomerate score of the different famous film critic organizations}
+    \item{\code{metascore}}{a numeric variable indicating the conglomerate score of the different famous film critic organizations.}
     \item{\code{gross}}{a numeric variable indicating the film's gross earnings.}
     \item{\code{awards_wins}}{a numeric variable indicating the number of awards the film won.}
     \item{\code{awards_nominations}}{a numeric variable indicating the number of award nominations the film received.}
     \item{\code{Golden_Globes_nominated, \cr Critics_Choice_nominated, \cr
-    BAFTA_nominated}}{a haracter variable indicating whether or not the film was nominated for the named award.}
+    BAFTA_nominated}}{a character variable indicating whether or not the film was nominated for the named award.}
   }
 }
 \details{
