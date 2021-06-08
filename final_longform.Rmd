@@ -177,7 +177,7 @@ oscar_test <- testing(oscar_split)
 oscar_folds <- vfold_cv(potential_data, v = 5, repeats = 3, strata = Oscar_nominated)
 ```
 
-Using our training data set, we created a recipe using `step_impute_bag()`, `step_dummy()`, and `step_normalize()`. We included 10 predictors: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` You can read more about each of these variables in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
+Using our training data set, we created a recipe using `step_impute_bag()`, `step_dummy()`, and `step_normalize()`. We included 10 predictors to predict our outcome variable, `Oscar_nominated`: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` You can read more about each of these variables in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
 
 ```{r, eval=FALSE}
 oscar_recipe <- recipe(
