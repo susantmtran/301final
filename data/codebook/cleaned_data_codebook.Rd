@@ -23,8 +23,9 @@ their respective film nominations and awards for 1183 pieces of media (released 
     \item{\code{gross}}{a numeric variable indicating the film's gross earnings.}
     \item{\code{awards_wins}}{a numeric variable indicating the number of awards the film won.}
     \item{\code{awards_nominations}}{a numeric variable indicating the number of award nominations the film received.}
-    \item{\code{Golden_Globes_nominated, \cr Critics_Choice_nominated, \cr
-    BAFTA_nominated}}{a character variable indicating whether or not the film was nominated for the named award.}
+    \item{\code{Golden_Globes_nominated}}{a numeric variable indicating the number of categories that the film was nominated for at the Golden Globe Awards.}
+     \item{\code{Critics_Choice_nominated}}{a numeric variable indicating the number of categories that the film was nominated for at the Critics' Choice Awards.}
+    \item{\code{BAFTA_nominated}}{a numeric variable indicating the number of categories that the film was nominated for at the BAFTA Awards.}
   }
 }
 \details{
@@ -37,6 +38,31 @@ BigML. "Movies 2000-2017." https://bigml.com/user/academy_awards/gallery/dataset
 %%  ~~ possibly secondary sources and usages ~~ idk if necessary
 }
 \examples{
-just paste the code for the ggplot or the recipe idk
+potential_data <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
+
+oscar_split <- initial_split(
+  potential_data, 
+  prop = 0.7, 
+  strata = Oscar_nominated
+)
+
+oscar_train <- training(oscar_split) 
+
+oscar_recipe <- recipe(
+  Oscar_nominated ~ duration + votes + rate + metascore + gross + 
+    awards_wins + awards_nominations + Golden_Globes_nominated +
+    Critics_Choice_nominated + BAFTA_nominated, 
+    data = oscar_train) %>%
+  step_impute_bag(metascore, gross) %>%
+  step_dummy(all_nominal(), -all_outcomes(), one_hot = TRUE) %>%
+  step_normalize(all_numeric()
+) 
+
+
 }
+
 \keyword{301final}
+
+
+
+
