@@ -16,15 +16,15 @@ their respective film nominations and awards for 1183 pieces of media (released 
   \describe{
     \item{\code{Oscar_nominated}}{the outcome variable in factor form indicating whether the film received any Oscar nominations or not, with 1+ nominations corresponding with '1' and 0 nominations corresponding with '0'.}
     \item{\code{certificate}}{a numeric variable ranging from 0.0 to 1.0 describing how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity.}
-    \item{\code{duration}}{a numeric/character variable indicating ____}
-    \item{\code{genre}}{a numeric/character variable indicating ____}
-    \item{\code{rate}}{a numeric/character variable indicating ____}
-    \item{\code{metascore}}{a numeric/character variable indicating ____}
-    \item{\code{gross}}{a numeric/character variable indicating ____}
-    \item{\code{awards_wins}}{a numeric/character variable indicating ____}
-    \item{\code{awards_nominations}}{a numeric/character variable indicating ____}
+    \item{\code{duration}}{a numeric variable indicating the number of minutes of the film.}
+    \item{\code{genre}}{a character variable indicating the genre of the film.}
+    \item{\code{rate}}{a numeric variable indicating the IMDb rating of the film.}
+    \item{\code{metascore}}{a numeric variable indicating the conglomerate score of the different famous film critic organizations}
+    \item{\code{gross}}{a numeric variable indicating the film's gross earnings.}
+    \item{\code{awards_wins}}{a numeric variable indicating the number of awards the film won.}
+    \item{\code{awards_nominations}}{a numeric variable indicating the number of award nominations the film received.}
     \item{\code{Golden_Globes_nominated, \cr Critics_Choice_nominated, \cr
-    BAFTA_nominated}}{a numeric/character variable indicating ____}
+    BAFTA_nominated}}{a haracter variable indicating whether or not the film was nominated for the named award.}
   }
 }
 \details{
