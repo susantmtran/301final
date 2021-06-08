@@ -1,7 +1,7 @@
 ---
-title: "Executive summary"
+title: "Executive Summary"
 author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
-date: "6/6/2021"
+date: "6/9/2021"
 output:
   html_document:
     toc: true
@@ -16,7 +16,7 @@ editor_options:
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
 ```
 
-# Data Set
+# Introduction
 
 ```{r}
 # load package 
@@ -25,12 +25,13 @@ library(tidyverse)
 library(naniar)
 
 # load data
-load("data/unprocessed/movies.RData")
+load("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 ```
 
-Our data set was found on [Kaggle](https://www.kaggle.com/nichen301/movie-data) and contains information about 651 randomly chosen movies produced and released before 2016 including critic data, Academy Award nominations, and main actors/actresses. A few variables of interest are `critics_rating`, `audience_rating`, `top200_box` , `best_actor_win`, `best_actress_win` , and `best_dir_win` which we will be using to predict `best_pic_nom`.
+Our data set was found on the BigML platform and contains IMDb data scrapes on 1,183 films released between 2000 and 2017 including award nominations, ratings, and award wins. We aim to predict whether or not the movie received any Oscar nominations.
 
+# Exploratory Data Analysis
 
 # Conclusion
 
-Wrapping up our analysis, we find that there is a small proportion of movies in this data set that have won Academy Awards. This ratio is unsurprising since so few movies are nominated for Academy Awards in comparison to the volume of movies produced. To combat this, we are considering merging all nomination categories. In this way we will have one variable to represent all possible award categories and then have a larger proportion of movies that fall into this variable.
+Wrapping up our analysis, the performance of our model in predicting whether a film received any Oscar nominations was strong. Next steps could include searching for more context into the meaning of some variables by gaining access to a codebook from the original data source, which we did not have as a resource.
