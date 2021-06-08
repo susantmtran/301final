@@ -14,19 +14,31 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
+
+# load package 
+library(tidyverse)
+library(tidymodels)
+
+# load data
+potential_data <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
+
+# load-objects -----------------------------------------------------------
+oscar_recipe <- readRDS("model-info/oscar_recipe.rds")
+oscar_train <- readRDS("data/processed/oscar_train.rds")
+oscar_test <- readRDS("data/processed/oscar_test.rds")
+oscar_folds <- readRDS("data/processed/oscar_folds.rds")
+
+rf_tuned <- read_rds("model-info/tuned/rf_tuned_best.rds")
+nn_tuned <- read_rds("model-info/tuned/nn_tuned_best.rds")
+bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
+mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
+en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
+
+# set-seed ---------------------------------------------------------------
+set.seed(101)
 ```
 
 # Introduction
-
-```{r}
-# load package 
-library(lubridate)
-library(tidyverse)
-library(naniar)
-
-# load data
-load("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
-```
 
 Our data set was found on the BigML platform and contains IMDb data scrapes on 1,183 films released between 2000 and 2017 including award nominations, ratings, and award wins. We aim to predict whether or not the movie received any Oscar nominations.
 
@@ -76,7 +88,7 @@ The above bar plot portrays a bimodal distribution of Oscar Best Picture winners
 
 For our recipe, we included the following 10 predictors: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` Additional context on our variables can be found in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
 
-```{r, eval = FALSE}
+```{r}
 oscar_recipe <- recipe(
   Oscar_nominated ~ duration + votes + rate + metascore + gross 
     + awards_wins + awards_nominations + Golden_Globes_nominated +
@@ -111,6 +123,34 @@ tune_results %>%
 # Model Fit and Results
 
 Upon fitting our winning random forest model on the testing data set, we got the following results for ROC-AUC and accuracy. Although accuracy was a bit lower, both of the metrics indicate strong model performance.
+
+```{r}
+# define-model
+rf_model <- rand_forest(mode = "classification",
+                        mtry = tune(),
+                        min_n = tune()) %>%
+  set_engine("ranger")
+
+
+# define-tuning-grid
+rf_params <- parameters(rf_model) %>%
+  update(mtry = mtry(c(1, 10)))
+
+rf_grid <- grid_regular(rf_params, levels = 5)
+
+# workflow
+rf_workflow <- workflow() %>%
+  add_model(rf_model) %>%
+  add_recipe(oscar_recipe)
+
+# tuned-workflow
+rf_workflow_tuned <- rf_workflow %>% 
+  finalize_workflow(select_best(rf_tuned, metric = "accuracy"))
+
+# fit 
+rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
+```
+
 
 ```{r}
 rf_accuracy <- rf_fit_results %>% 
