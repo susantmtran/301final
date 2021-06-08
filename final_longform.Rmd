@@ -1,6 +1,7 @@
 ---
-title: "Final Project for STAT 301-3"
-subtitle: "Spring 2021"
+title: "Predicting Oscar-Nominations Between 2000 and 2017"
+subtitle: "Data Science III (STAT 301-3)"
+date: "Spring 2021"
 author: "Grace Park, Susan Tran, Nomi Tannenbaum, Jamie Lee, Alex Chang"
 output:
   html_document:
@@ -15,14 +16,14 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 
-# load-packages ----------------------------------------------------------
+# load-packages
 library(tidymodels)
 library(tidyverse)
 
-# load-data --------------------------------------------------------------
+# load-data
 potential_data <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
-# load-objects -----------------------------------------------------------
+# load-objects
 oscar_recipe <- readRDS("model-info/oscar_recipe.rds")
 oscar_train <- readRDS("data/processed/oscar_train.rds")
 oscar_test <- readRDS("data/processed/oscar_test.rds")
@@ -34,13 +35,15 @@ bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
 mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
 en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
 
-# set-seed ---------------------------------------------------------------
+# set-seed
 set.seed(101)
 ```
 
 # *Introduction*
 
 We discovered our data set through the BigML platform, which is considered to be a powerful machine learning service in the data science world. There are [multiple data sets](https://bigml.com/user/academy_awards/gallery/datasets) related to the Academy Awards on BigML, whose users scraped the data from [IMDb](https://www.imdb.com/), a well-known online database on movies, television shows, and so forth. We are focusing the [2000-2017](https://bigml.com/user/academy_awards/gallery/dataset/5a94302592fb565ed400103b) time period of nominations and awards, and plan to predict whether or not a film has received an Oscar nomination (in any category) depending on a few select variables. We chose this data set due to our shared interest in film as well as our curiosity regarding how well a nomination could be predicted when limited to the variables in the data.
+
+<br>
 
 # *Exploratory Data Analysis*
 
@@ -166,7 +169,7 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 <br>
 
-# *Feature Engineering*
+# *Resampling and Feature Engineering*
 
 Before beginning the feature engineering process, we split the data using 70% for the training set (`oscar_train`) and 30% for the testing set (`oscar_test`). We then resampled our training data set (`oscar_folds`) using V-fold cross-validation with five folds and three repeats, stratified by our outcome variable, `Oscar_nominated`.
 
@@ -177,7 +180,7 @@ oscar_test <- testing(oscar_split)
 oscar_folds <- vfold_cv(potential_data, v = 5, repeats = 3, strata = Oscar_nominated)
 ```
 
-Using our training data set, we created a recipe using `step_impute_bag()`, `step_dummy()`, and `step_normalize()`. We included 10 predictors to predict our outcome variable, `Oscar_nominated`: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` You can read more about each of these variables in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
+Using our training data set, we created a recipe using `step_impute_bag()`, `step_dummy()`, and `step_normalize()`. We included 10 predictors to predict our outcome variable: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` You can read more about each of these variables in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
 
 ```{r, eval=FALSE}
 oscar_recipe <- recipe(
@@ -415,7 +418,7 @@ rf_fit_results %>%
 We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (`0.868`), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (`0.923`), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC AUC through the ROC curve.
 
 ```{r}
-# ROC-AUC -----------------------------------------------------------------
+# ROC-AUC
 rf_fit_results %>% 
   predict(new_data = oscar_test, type = "prob") %>% 
   bind_cols(truth = oscar_test$Oscar_nominated) %>% 

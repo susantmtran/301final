@@ -1,19 +1,20 @@
 ---
-title: "Executive Summary"
-author: "Grace Park, Susan Tran, Nomi Tannenbaum. Jamie Lee, Alex Chang"
-date: "6/9/2021"
+title: "Predicting Oscar-Nominations Between 2000 and 2017 (Executive Summary)"
+author: "Grace Park, Susan Tran, Nomi Tannenbaum, Jamie Lee, Alex Chang"
+date: "Spring 2021"
 output:
   html_document:
-    toc: true
-    toc_float: true
+    toc: yes
+    toc_float: yes
     theme: paper
     code_folding: hide
-editor_options: 
+subtitle: Data Science III (STAT 301-3)
+editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE, comment=FALSE)
+knitr::opts_chunk$set(warning=FALSE, message=FALSE)
 
 # load package 
 library(tidyverse)
@@ -22,7 +23,7 @@ library(tidymodels)
 # load data
 potential_data <- read_csv("data/unprocessed/BigML_Dataset_5f50a62c2fb31c516d000176.csv")
 
-# load-objects -----------------------------------------------------------
+# load-objects
 oscar_recipe <- readRDS("model-info/oscar_recipe.rds")
 oscar_train <- readRDS("data/processed/oscar_train.rds")
 oscar_test <- readRDS("data/processed/oscar_test.rds")
@@ -34,15 +35,19 @@ bt_tuned <- read_rds("model-info/tuned/bt_tuned_best.rds")
 mlp_tuned <- read_rds("model-info/tuned/mlp_tuned_best.rds")
 en_tuned <- read_rds("model-info/tuned/en_tuned_best.rds")
 
-# set-seed ---------------------------------------------------------------
+# set-seed
 set.seed(101)
 ```
 
-# Introduction
+# *Introduction*
 
-Our data set was found on the BigML platform and contains IMDb data scrapes on 1,183 films released between 2000 and 2017 including award nominations, ratings, and award wins. We aim to predict whether or not the movie received any Oscar nominations.
+Our data set was found on the BigML platform and contains IMDb data scrapes on 1,183 films released between 2000 and 2017 including award nominations, ratings, and award wins. We aim to predict whether or not the movie received any Oscar nominations, `Oscar_nominated`. Our outcome variable, `Oscar_nominated` is a categorical variable that we converted into a factor with two levels: `0` and `1`. `0` represents movies that received no Oscar nominations, and `1` represents movies that were nominated for at least one Oscar category. 
 
-# Exploratory Data Analysis
+<br>
+
+# *Exploratory Data Analysis*
+
+To start our EDA, we can look at the relationship between total a film's total numer of award nominations and total award wins. In the plot below, we can see that a film's total number of award nominations has a positive correlation with its total wins and that the films nominated for the Oscars Best Picture award tend to have more total nominations, which makes sense given that great films will likely be nominated for other prestigious awards as well.
 
 ```{r}
 potential_data %>% ggplot(aes(awards_nominations, awards_wins)) +
@@ -63,7 +68,7 @@ potential_data %>% ggplot(aes(awards_nominations, awards_wins)) +
         plot.subtitle = element_text(hjust = 0.5))
 ```
 
-Here, we can see that a film's total number of award nominations has a positive correlation with its total wins and that the films nominated for the Oscars Best Picture award tend to have more total nominations, which makes sense given that great films will likely be nominated for other prestigious awards as well.
+The bar plot below portrays a bimodal distribution of Oscar Best Picture winners by month of the film's release, with notable peaks in January and the last few months of the year, although there are some missing data to be cognizant of. We speculate that the excitement of the new year might contribute to that peak in January, while the peaks in October, November, and December might be attributable to the fact that the films are more memorable and have more "buzz" around the cutoff date of December 31st.
 
 ```{r}
 potential_data %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na() %>% 
@@ -82,11 +87,13 @@ potential_data %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na
         plot.subtitle = element_text(hjust = 0.5))
 ```
 
-The above bar plot portrays a bimodal distribution of Oscar Best Picture winners by month of the film's release, with notable peaks in January and the last few months of the year, although there are some missing data to be cognizant of. We speculate that the excitement of the new year might contribute to that peak in January, while the peaks in October, November, and December might be attributable to the fact that the films are more memorable and have more 'buzz' around the cutoff date of December 31st.
+<br>
 
-# Feature Engineering
+# *Resampling and Feature Engineering*
 
-For our recipe, we included the following 10 predictors: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` Additional context on our variables can be found in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
+Before beginning the feature engineering process, we split the data using 70% for the training set (`oscar_train`) and 30% for the testing set (`oscar_test`). We then resampled our training data set (`oscar_folds`) using V-fold cross-validation with five folds and three repeats, stratified by our outcome variable, `Oscar_nominated`.
+
+For our recipe, we included 10 predictors to predict our outcome variable: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` Additional context on our variables can be found in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
 
 ```{r}
 oscar_recipe <- recipe(
@@ -100,7 +107,9 @@ oscar_recipe <- recipe(
   step_normalize(all_numeric()) 
 ```
 
-# Model Assessment
+<br>
+
+# *Model Assessment*
 
 We tried five different models: boosted tree (`bt_model`), elastic net (`en_model`), K-nearest neighbors (`nn_model`), multilayer perceptron (`mlp_model`), and random forest (`rf_model`). We found that our random forest model was most successful, with an accuracy of 0.875 prior to fitting the model on the entire training set or the testing set.
 
@@ -120,7 +129,9 @@ tune_results %>%
   arrange(desc(accuracy))
 ```
 
-# Model Fit and Results
+<br>
+
+# *Model Fit and Results*
 
 Upon fitting our winning random forest model on the testing data set, we got the following results for ROC-AUC and accuracy. Although accuracy was a bit lower, both of the metrics indicate strong model performance.
 
@@ -149,10 +160,8 @@ rf_workflow_tuned <- rf_workflow %>%
 
 # fit 
 rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
-```
 
-
-```{r}
+# results
 rf_accuracy <- rf_fit_results %>% 
   predict(oscar_test) %>% 
   bind_cols(truth = oscar_test$Oscar_nominated) %>% 
@@ -168,8 +177,16 @@ rf_fit_results %>%
     Estimate = .estimate
   ) %>% 
   select(Metric, Estimate) # select
+
+rf_fit_results %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_curve(truth = truth, .pred_0) %>% 
+  autoplot()
 ```
 
-# Conclusion
+<br>
+
+# *Conclusion*
 
 Wrapping up our analysis, we found that the performance of our model in predicting whether a film received any Oscar nominations was quite strong. Next steps could include searching for more context into the meaning of some variables by gaining access to a codebook from the original data source, which we did not have as a resource.
