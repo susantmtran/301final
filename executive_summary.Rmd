@@ -32,6 +32,104 @@ Our data set was found on the BigML platform and contains IMDb data scrapes on 1
 
 # Exploratory Data Analysis
 
+```{r}
+potential_data %>% ggplot(aes(awards_nominations, awards_wins)) +
+  geom_jitter(aes(color = Oscar_Best_Picture_nominated), alpha = 0.5) +
+  scale_color_manual("Nominated for Oscars Best Picture?",
+                     values = c("#008f69", "#2f84de"),
+                     labels = c("NO", "YES")) +
+  geom_smooth(color = "black") +
+  labs(title = "Cumulative Nominations and Awards",
+       subtitle = "Films Released during 2000–2017",
+       x = "Total Nominations",
+       y = "Total Wins",
+       caption = "For The Academy Awards, Golden Globes, BAFTA, and other prestigious
+       film critic organizations.") +
+  theme_classic() +
+  theme(legend.position = "top",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+Here, we can see that a film's total number of award nominations has a positive correlation with its total wins and that the films nominated for the Oscars Best Picture award tend to have more total nominations, which makes sense given that great films will likely be nominated for other prestigious awards as well.
+
+```{r}
+potential_data %>% count(release_date.month, Oscar_Best_Picture_won) %>% drop_na() %>% 
+  filter(Oscar_Best_Picture_won == "Yes") %>% 
+  select(1, 3) %>% 
+  ggplot(aes(release_date.month, n)) +
+  geom_col(aes(fill = release_date.month)) +
+  scale_x_continuous(breaks = seq(1, 12, 1)) +
+  labs(title = "Total Number of Oscar Best Picture Winners, By Month of Release",
+       subtitle = "Films Released during 2000–2017",
+       x = "Calendar Month",
+       y = NULL) +
+  theme_classic() +
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+The above bar plot portrays a bimodal distribution of Oscar Best Picture winners by month of the film's release, with notable peaks in January and the last few months of the year, although there are some missing data to be cognizant of. We speculate that the excitement of the new year might contribute to that peak in January, while the peaks in October, November, and December might be attributable to the fact that the films are more memorable and have more 'buzz' around the cutoff date of December 31st.
+
+# Feature Engineering
+
+For our recipe, we included the following 10 predictors: `duration`, `votes`, `rate`, `metascore`, `gross`, `awards_wins`, `awards_nominations`, `Golden_Globes_nominated`, `Critics_Choice_nominate`, and `BAFTA_nominated.` Additional context on our variables can be found in our codebook (`data/codebook/cleaned_data_codebook.Rd`).
+
+```{r, eval = FALSE}
+oscar_recipe <- recipe(
+  Oscar_nominated ~ duration + votes + rate + metascore + gross 
+    + awards_wins + awards_nominations + Golden_Globes_nominated +
+    Critics_Choice_nominated + BAFTA_nominated, 
+  data = oscar_train
+) %>%
+  step_impute_bag(metascore, gross) %>%
+  step_dummy(all_nominal(), -all_outcomes(), one_hot = TRUE) %>%
+  step_normalize(all_numeric()) 
+```
+
+# Model Assessment
+
+We tried five different models: boosted tree (`bt_model`), elastic net (`en_model`), K-nearest neighbors (`nn_model`), multilayer perceptron (`mlp_model`), and random forest (`rf_model`). We found that our random forest model was most successful, with an accuracy of 0.875 prior to fitting the model on the entire training set or the testing set.
+
+```{r}
+tune_results <- tibble(
+  model_type = c("rf_tuned", "nn_tuned", "mlp_tuned", "en_tuned", "bt_tuned"),
+  tune_info = list(rf_tuned, nn_tuned, mlp_tuned, en_tuned, bt_tuned),
+  assessment_info = map(tune_info, collect_metrics),
+  best_model = map(tune_info, ~select_best(.x, metric = "accuracy")))
+
+tune_results %>%
+  select(model_type, assessment_info) %>%
+  unnest(assessment_info) %>%
+  filter(.metric == "accuracy") %>%
+  group_by(model_type) %>%
+  summarise(accuracy = max(mean)) %>% 
+  arrange(desc(accuracy))
+```
+
+# Model Fit and Results
+
+Upon fitting our winning random forest model on the testing data set, we got the following results for ROC-AUC and accuracy. Although accuracy was a bit lower, both of the metrics indicate strong model performance.
+
+```{r}
+rf_accuracy <- rf_fit_results %>% 
+  predict(oscar_test) %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  accuracy(truth = truth, estimate = .pred_class) 
+
+rf_fit_results %>% 
+  predict(new_data = oscar_test, type = "prob") %>% 
+  bind_cols(truth = oscar_test$Oscar_nominated) %>% 
+  roc_auc(truth = truth, .pred_0) %>% # roc-auc
+  bind_rows(rf_accuracy) %>% # elastic net accuracy (stored)
+  mutate(
+    Metric = .metric, # rename
+    Estimate = .estimate
+  ) %>% 
+  select(Metric, Estimate) # select
+```
+
 # Conclusion
 
-Wrapping up our analysis, the performance of our model in predicting whether a film received any Oscar nominations was strong. Next steps could include searching for more context into the meaning of some variables by gaining access to a codebook from the original data source, which we did not have as a resource.
+Wrapping up our analysis, we found that the performance of our model in predicting whether a film received any Oscar nominations was quite strong. Next steps could include searching for more context into the meaning of some variables by gaining access to a codebook from the original data source, which we did not have as a resource.

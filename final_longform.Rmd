@@ -166,7 +166,6 @@ Now that we have performed a thorough exploratory analysis on our data set, we a
 
 <br>
 
-
 # *Feature Engineering*
 
 Before beginning the feature engineering process, we split the data using 70% for the training set (`oscar_train`) and 30% for the testing set (`oscar_test`). We then resampled our training data set (`oscar_folds`) using V-fold cross-validation with five folds and three repeats, stratified by our outcome variable, `Oscar_nominated`.
@@ -194,14 +193,13 @@ oscar_recipe <- recipe(
 
 <br>
 
-
 # *Machine Learning and Model Workflows*
 
 For this project, we used five algorithms to compete the following model types against one another in order to produce the best results: boosted tree (`bt_model`), elastic net (`en_model`), K-nearest neighbors (`nn_model`), multilayer perceptron (`mlp_model`), and random forest (`rf_model`). As you can see in `final/model-info/drafts`, we tested each model with multiple recipes and parameter values before finalizing the recipe that is used in each tuning script in `final/model-info/best-models`. The finalized recipe is used for each model's workflow below.
 
 ## Boosted Tree
 
-For our boosted tree model, we tuned the parameters `mtry`, `min_n`, and `learn_rate`, using the default values for `min_n` but updating the values for `mtry` and `learn_rate`. We then defined our tuning grid and workflow in order to tune our model. 
+For our boosted tree model, we tuned the parameters `mtry`, `min_n`, and `learn_rate`, using the default values for `min_n` but updating the values for `mtry` and `learn_rate`. We then defined our tuning grid and workflow in order to tune our model.
 
 ```{r, eval=FALSE}
 # define-model
@@ -231,7 +229,7 @@ bt_tuned <- bt_workflow %>%
 
 ## Elastic Net
 
-For our elastic net model, we tuned the parameters `mixture` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model. 
+For our elastic net model, we tuned the parameters `mixture` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model.
 
 ```{r, eval=FALSE}
 # define-model
@@ -257,7 +255,7 @@ en_tuned <- en_workflow %>%
 
 ## KNN
 
-For our K-nearest neighbors model, we tuned the parameters `neighbors`, using its default values. We then defined our tuning grid and workflow in order to tune our model. 
+For our K-nearest neighbors model, we tuned the parameters `neighbors`, using its default values. We then defined our tuning grid and workflow in order to tune our model.
 
 ```{r, eval=FALSE}
 # define-model
@@ -281,9 +279,9 @@ nn_tuned <- nn_workflow %>%
   tune_grid(oscar_folds, grid = nn_grid)
 ```
 
-## Multilayer perceptron
+## Multilayer Perceptron
 
-For our multilayer perceptron model, we tuned the parameters `hidden_units` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model. 
+For our multilayer perceptron model, we tuned the parameters `hidden_units` and `penalty`, using the default values for both. We then defined our tuning grid and workflow in order to tune our model.
 
 ```{r, eval=FALSE}
 # define-model
@@ -310,7 +308,7 @@ mlp_tuned <- mlp_workflow %>%
 
 ## Random Forest
 
-For our random forest model, we tuned the parameters `mtry` and `min_n`, updating `mtry` and using the default values for `min_n`. We then defined our tuning grid and workflow in order to tune our model. 
+For our random forest model, we tuned the parameters `mtry` and `min_n`, updating `mtry` and using the default values for `min_n`. We then defined our tuning grid and workflow in order to tune our model.
 
 ```{r, eval=FALSE}
 # define-model
@@ -336,12 +334,11 @@ rf_tuned <- rf_workflow %>%
 
 <br>
 
+# *Model Assessment*
 
-# *Model Assessment* 
+To select the best model for this classification problem, we used the accuracy metric. As you can see from the tibble below, our random forest model performed the best --- but only slightly better than our boosted tree model, which had an accuracy of `0.874` --- with an accuracy of `0.875`.
 
-To select the best model for this classification problem, we used the accuracy metric. As you can see from the tibble below, our random forest model performed the best --- but only slightly better than our boosted tree model, which had an accuracy of `0.874` --- with an accuracy of `0.875`. 
-
-Our best multilayer perceptron and elastic net models performed comparably, both with an accuracy around `0.86`. However, our best K-nearest neighbors model performed the worst with an accuracy of `0.846`, which is still a fairly good result. 
+Our best multilayer perceptron and elastic net models performed comparably, both with an accuracy around `0.86`. However, our best K-nearest neighbors model performed the worst with an accuracy of `0.846`, which is still a fairly good result.
 
 ```{r}
 tune_results <- tibble(
@@ -363,10 +360,9 @@ Based on these findings, the random forest was our best performing model. Thus, 
 
 <br>
 
-
 # *Model Fit and Results*
 
-Now that we have selected the best-performing model from our trials, we can finalize our model workflow using the best tuned model and the entire training data set. 
+Now that we have selected the best-performing model from our trials, we can finalize our model workflow using the best tuned model and the entire training data set.
 
 ```{r}
 # define-model
@@ -396,7 +392,7 @@ rf_workflow_tuned <- rf_workflow %>%
 rf_fit_results <- fit(rf_workflow_tuned, oscar_train)
 ```
 
-Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results. 
+Once we fit our winning random forest model on the training set and then the testing set, we obtained the following results.
 
 ```{r}
 rf_accuracy <- rf_fit_results %>% 
@@ -416,7 +412,7 @@ rf_fit_results %>%
   select(Metric, Estimate) # select
 ```
 
-We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (`0.868`), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (`0.923`), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC AUC through the ROC curve. 
+We included both ROC-AUC and accuracy as performance metrics, seeing a slight decrease in performance for the accuracy (`0.868`), although it is still relatively high. The area under the ROC-AUC curve is also fairly high (`0.923`), which is a numerical measure of how good the model is at classifying between whether or not the film received an Oscar nomination. Below is a visual representation of the ROC AUC through the ROC curve.
 
 ```{r}
 # ROC-AUC -----------------------------------------------------------------
@@ -429,9 +425,6 @@ rf_fit_results %>%
 
 <br>
 
-
 # *Conclusion*
 
 Overall, we are pleased with our model's ability to predict a film's Oscar nomination or lack thereof, especially given that there are various factors that lead to a nomination that may not be measurable with predictors in a data set. A codebook is an additional resource that could have helped improve model performance - our data source did not provide one and we therefore did not gain as much context into the variables we were working with as we had initially hoped, leaving us to our speculation. Although most were relatively straightforward which allowed us to make reasonable assumptions, next steps could include gaining that additional information which may be useful.
-
-
